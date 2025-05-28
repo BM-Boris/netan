@@ -1,0 +1,9 @@
+Django>=4.2,<5.0
+djangorestframework>=3.14.0
+django-cors-headers>=3.13.0
+numpy>=1.23.0
+pandas>=1.5.0
+networkx>=3.0
+scikit-learn>=1.2.0
+joblib>=1.2.0
+rodin>=0.1.0
