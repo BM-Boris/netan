@@ -235,14 +235,74 @@ const DataUploadWithType = ({ onFilesChange, onSyncChange }) => {
           <DialogTitle>Data Upload Instructions</DialogTitle>
           <DialogContent>
             <DialogContentText>
-              Please upload your data files according to the following guidelines:
+                  <p>
+                Provide one or more CSV files containing your feature and sample data:
+              </p>
               <ul>
-                <li><strong>Metabolomics:</strong> CSV/TXT with metabolite measurements.</li>
-                <li><strong>Transcriptomics:</strong> CSV/TXT with gene expression data.</li>
-                <li><strong>Genomics:</strong> CSV/TXT with genetic variants or sequences.</li>
-                <li><strong>Meta Data:</strong> Additional sample or experimental info.</li>
+                <li><strong>Mass Spectrometry</strong>: Untargeted m/z, retention time, and intensities.</li>
+                <li><strong>Transcriptomics / Genomics / Targeted MS</strong>: Identifier column + sample columns.</li>
+                <li><strong>Meta Data</strong>: Sample annotation table (first column = sample IDs).</li>
+                <li><strong>Other</strong>: Any numeric feature matrix.</li>
               </ul>
-              You can add multiple files and specify a data type for each.
+              
+              <table className="table">
+                <thead>
+                  <tr>
+                    <th style={{ paddingRight: '20px' }}>m/z</th>
+                    <th style={{ paddingRight: '40px' }}>rt</th>
+                    <th style={{ paddingRight: '20px' }}>sample1</th>
+                    <th style={{ paddingRight: '20px' }}>sample2</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>85.02</td>
+                    <td>62.3</td>
+                    <td>2723031</td>
+                    <td>2182606.4</td>
+                  </tr>
+                  <tr>
+                    <td>86.06</td>
+                    <td>293.2</td>
+                    <td>3011843.5</td>
+                    <td>2931308.9</td>
+                  </tr>
+                </tbody>
+              </table>
+              <p>
+                <strong>Samples table</strong> must contain sample IDs as the first column and class labels for other columns:
+              </p>
+              <table className="table">
+                <thead>
+                  <tr>
+                    <th style={{ paddingRight: '20px' }}>sample id</th>
+                    <th style={{ paddingRight: '20px' }}>dose</th>
+                    <th>time</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td >sample1</td>
+                    <td >5mg</td>
+                    <td>1</td>
+                  </tr>
+                  <tr>
+                    <td >sample2</td>
+                    <td >10mg</td>
+                    <td>4</td>
+                  </tr>
+                </tbody>
+              </table>
+              <p>
+                Sample columns are automatically aligned across all files; any sample not present in every file will be removed.
+              </p>
+              <p>
+                Use +/– to add or remove entries. Enable <em>"Sync Settings"</em> to copy your preprocessing and filter choices to every non-meta file automatically.
+              </p>
+            
+              <p>
+                <strong>*</strong> Feature indexes in results match their position (starting from zero) in the original data.
+              </p>
             </DialogContentText>
           </DialogContent>
           <DialogActions>

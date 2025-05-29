@@ -708,27 +708,82 @@ const ParametersForm = ({ onChangeParams, syncAll = true, files = [] }) => {
       {/* Conditionally render network parameters */}
       {showNetwork && renderNetworkCard()}
 
-      <Dialog open={dialogOpen} onClose={handleDialogClose}>
+      <Dialog open={dialogOpen} onClose={handleDialogClose} maxWidth="md">
         <DialogTitle>Parameter Instructions</DialogTitle>
         <DialogContent>
-          <DialogContentText>
-            <ul>
-              <li>
-                <strong>Preprocessing:</strong> threshold, normalization,
-                transformation, scaling
-              </li>
-              <li>
-                <strong>Filter Selection:</strong> method, meta column, Threshold
-                (capital T)
-              </li>
-              <li>
-                <strong>Network:</strong> method, edge threshold, layout
-              </li>
-            </ul>
-            <p>
-              This version preserves your values even when files are added or
-              removed.
-            </p>
+        <DialogContentText component="div">
+        <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 2 }}>
+          Preporcessing
+        </Typography>
+        <Box component="ul" sx={{ pl: 2 }}>
+          <Box component="li" sx={{ mb: 1 }}>
+            <strong>Missing Filter:</strong> Maximum percentage of missing values allowed per feature.
+          </Box>
+          <Box component="li" sx={{ mb: 1 }}>
+            <strong>Normalization:</strong> Method to adjust signal intensity.
+          </Box>
+          <Box component="li" sx={{ mb: 1 }}>
+            <strong>Transformation:</strong> Log₂ or natural log to stabilize variance.
+          </Box>
+          <Box component="li" sx={{ mb: 1 }}>
+            <strong>Scaling:</strong> Autoscale (unit variance) or Pareto scaling.
+          </Box>
+        </Box>
+        <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 2 }}>
+          Filtering
+        </Typography>
+        <Box component="ul" sx={{ pl: 2 }}>
+          <Box component="li" sx={{ mb: 1 }}>
+            <strong>Filter Method:</strong> Statistical test or importance metric (T-test, ANOVA, etc.).
+          </Box>
+          <Box component="li" sx={{ mb: 1 }}>
+            <strong>Meta Column:</strong> Metadata field used for grouping or comparison.
+          </Box>
+          <Box component="li" sx={{ mb: 1 }}>
+            <strong>Stats Threshold:</strong> Cutoff for feature filtering (p-value or importance score).
+          </Box>
+        </Box>
+        <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 2 }}>
+          Network
+        </Typography>
+        <Box component="ul" sx={{ pl: 2 }}>
+          <Box component="li" sx={{ mb: 1 }}>
+            <strong>Network Method:</strong> Algorithm to infer relations (Spearman, CLR, RF, Glasso).
+          </Box>
+          <Box component="li" sx={{ mb: 1 }}>
+            <strong>Node Mode:</strong> Choose samples or features as graph nodes.
+          </Box>
+          <Box component="li" sx={{ mb: 1 }}>
+            <strong>Layer Mode:</strong> Stack all data or build per-layer networks.
+          </Box>
+          <Box component="li" sx={{ mb: 1 }}>
+            <strong>Aggregation:</strong> Fusion rule for multilayer (mean, median, max).
+          </Box>
+          <Box component="li" sx={{ mb: 1 }}>
+            <strong>Edge Threshold:</strong> Minimum similarity value for an edge.
+          </Box>
+          <Box component="li" sx={{ mb: 1 }}>
+            <strong>Layout:</strong> Graph layout algorithm (force-directed, circular, Kamada-Kawai, random).
+          </Box>
+          <Box component="li" sx={{ mb: 1 }}>
+            <strong>Edge Weights:</strong> Toggle including similarity values on edges.
+          </Box>
+          <Box component="li" sx={{ mb: 1 }}>
+            <strong>n Neighbors:</strong> Number of neighbors for MI estimation in CLR.
+          </Box>
+          <Box component="li" sx={{ mb: 1 }}>
+            <strong>n Estimators:</strong> Number of trees in Random Forest.
+          </Box>
+          <Box component="li" sx={{ mb: 1 }}>
+            <strong>Max Depth:</strong> Maximum tree depth for Random Forest.
+          </Box>
+          <Box component="li" sx={{ mb: 1 }}>
+            <strong>Alpha:</strong> Regularization strength for Graphical Lasso.
+          </Box>
+          <Box component="li">
+            <strong>Max Iter:</strong> Maximum iterations for Graphical Lasso solver.
+          </Box>
+        </Box>
           </DialogContentText>
         </DialogContent>
       </Dialog>

@@ -32,7 +32,7 @@ const Guide = () => (
         </Typography>
         <CardContent>
           <Typography paragraph>
-            This app processes multi-omics feature tables entirely in your browser heap. You upload numeric data files (e.g., metabolite intensities, gene expression matrices), specify preprocessing and filtering rules, choose network inference methods, and get an interactive network visualization. All calculations run in memory—no data leaves your machine or is saved on a server.
+            Netan processes multi-omics feature tables entirely in your browser heap. You upload numeric data files (e.g., metabolite intensities, gene expression matrices), specify preprocessing and filtering rules, choose network inference methods, and get an interactive network visualization with data. 
           </Typography>
         </CardContent>
       </Card>
@@ -57,17 +57,10 @@ const Guide = () => (
                 Untargeted m/z, retention time, and intensities.
               </Typography>
             </Box>
+            
             <Box component="li" sx={listItemStyles}>
               <Typography variant="subtitle1" sx={{ fontWeight: 'medium' }}>
-                Targeted MS
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                Panel-based intensities per sample.
-              </Typography>
-            </Box>
-            <Box component="li" sx={listItemStyles}>
-              <Typography variant="subtitle1" sx={{ fontWeight: 'medium' }}>
-                Transcriptomics / Genomics
+                Transcriptomics / Genomics / Targeted MS
               </Typography>
               <Typography variant="body2" color="text.secondary">
                 Identifier column + sample columns.
@@ -90,8 +83,12 @@ const Guide = () => (
               </Typography>
             </Box>
           </Box>
+          <br></br>
           <Typography paragraph>
-            Use +/– to add or remove entries. Enable “Sync Settings” to copy your preprocessing and filter choices to every non-meta file automatically.
+            Use +/– to add or remove entries. Enable “Sync Settings” to copy your preprocessing and filter choices to every non-meta file automatically. 
+          </Typography>
+          <Typography>
+            Sample columns are automatically aligned across all files; any sample not present in every file will be removed.
           </Typography>
         </CardContent>
       </Card>
@@ -149,57 +146,54 @@ const Guide = () => (
               </Typography>
             </Box>
           </Box>
-          <Typography paragraph>
-            FileStats update live to show feature counts before/after each step.
-          </Typography>
         </CardContent>
       </Card>
     </Grow>
 
     {/* 3. Network Inference Methods */}
-    <Grow in timeout={500}>
-      <Card sx={{ ...cardStyles, width: '100%', mb: 4 }}>
-        <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 1 }}>
-          3. Network Inference Methods
-        </Typography>
-        <CardContent>
-          <Box component="ul" sx={{ pl: 2, m: 0 }}>
-            <Box component="li" sx={{ ...listItemStyles, mt: 0 }}>
-              <Typography variant="subtitle1" sx={{ fontWeight: 'medium' }}>
-                Spearman Correlation
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                Calculates Spearman rank correlation for every variable pair and adds edges based on your threshold. Instantaneous; no progress updates.
-              </Typography>
-            </Box>
-            <Box component="li" sx={listItemStyles}>
-              <Typography variant="subtitle1" sx={{ fontWeight: 'medium' }}>
-                CLR (Context Likelihood of Relatedness)
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                Estimates mutual information via k-nearest-neighbors, symmetrizes MI matrix, transforms to z-scores, and thresholds edges. Aborts if density too high; progress at 50%, 90%, and 100%.
-              </Typography>
-            </Box>
-            <Box component="li" sx={listItemStyles}>
-              <Typography variant="subtitle1" sx={{ fontWeight: 'medium' }}>
-                Random Forest Similarity
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                Uses an ExtraTrees ensemble to compute proximity scores from tree co-occurrence, symmetrizes importance, thresholds edges, and updates progress per tree block.
-              </Typography>
-            </Box>
-            <Box component="li" sx={listItemStyles}>
-              <Typography variant="subtitle1" sx={{ fontWeight: 'medium' }}>
-                Graphical Lasso
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                Predicts runtime on a subset then fits full sparse inverse-covariance model with L1 penalty. Converts precision matrix to partial correlations, thresholds edges, auto-adjusts alpha on errors, and shows threaded progress (0–80% fitting, 100% finish).
-              </Typography>
-            </Box>
-          </Box>
-        </CardContent>
-      </Card>
-    </Grow>
+<Grow in timeout={500}>
+  <Card sx={{ ...cardStyles, width: '100%', mb: 4 }}>
+    <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 1 }}>
+      3. Network Inference Methods
+    </Typography>
+    <CardContent>
+      <Box component="ul" sx={{ pl: 2, m: 0 }}>
+        <Box component="li" sx={{ ...listItemStyles, mt: 0 }}>
+          <Typography variant="subtitle1" sx={{ fontWeight: 'medium' }}>
+            Spearman Correlation
+          </Typography>
+          <Typography variant="body2" color="text.secondary">
+            Ranks each variable’s values and computes the Spearman correlation matrix. Converts to binary adjacency by thresholding absolute values, then builds an undirected graph. If weights are enabled, edge weights reflect the absolute rank correlation.
+          </Typography>
+        </Box>
+        <Box component="li" sx={listItemStyles}>
+          <Typography variant="subtitle1" sx={{ fontWeight: 'medium' }}>
+            CLR (Context Likelihood of Relatedness)
+          </Typography>
+          <Typography variant="body2" color="text.secondary">
+            Computes pairwise mutual information via k-nearest-neighbors, symmetrizes the matrix, then transforms each MI value into a z-score using row- and column-wise statistics. Applies your threshold to the z-score matrix to form edges. Automatically aborts if the network becomes too dense.
+          </Typography>
+        </Box>
+        <Box component="li" sx={listItemStyles}>
+          <Typography variant="subtitle1" sx={{ fontWeight: 'medium' }}>
+            Random Forest Similarity
+          </Typography>
+          <Typography variant="body2" color="text.secondary">
+            For each feature, trains an ExtraTreesRegressor to predict that feature from all others; uses the tree’s feature_importances_ as similarity scores. Symmetrizes the importance matrix, applies the threshold, and constructs the graph. Weighted edges carry the averaged importance values.
+          </Typography>
+        </Box>
+        <Box component="li" sx={listItemStyles}>
+          <Typography variant="subtitle1" sx={{ fontWeight: 'medium' }}>
+            Graphical Lasso
+          </Typography>
+          <Typography variant="body2" color="text.secondary">
+            Fits a sparse inverse covariance (precision) model with L1 penalty to your data. Calculates partial correlations from the precision matrix, thresholds them to define edges, and builds the network. Automatically increases the penalty if the covariance estimate is not positive-definite. Weighted edges reflect the magnitude of partial correlations.
+          </Typography>
+        </Box>
+      </Box>
+    </CardContent>
+  </Card>
+</Grow>
 
     {/* 4. Modes & Aggregation */}
     <Grow in timeout={500}>
@@ -327,7 +321,7 @@ const Guide = () => (
                 Export Options
               </Typography>
               <Typography variant="body2" color="text.secondary">
-                Download edge list CSV or merged feature–metadata table as JSON.
+                Download edge list CSV or merged feature–metadata table.
               </Typography>
             </Box>
           </Box>
@@ -344,11 +338,9 @@ const Guide = () => (
           </Typography>
           <CardContent>
             <Typography paragraph>
-              All computations occur client-side. No data is uploaded or stored.
+              No data is stored.
             </Typography>
-            <Typography>
-              Contact: <Link href="mailto:privacy@networkbuilder.app">privacy@networkbuilder.app</Link>
-            </Typography>
+           
           </CardContent>
         </Card>
       </Grow>
@@ -362,7 +354,7 @@ const Guide = () => (
               Support: <Link href="mailto:boris.minasenko@emory.edu">boris.minasenko@emory.edu</Link>
             </Typography>
             <Typography>
-              Code & docs: <Link href="https://github.com/BM-Boris/rodin">github.com/BM-Boris/rodin</Link>
+              Code & docs: <Link href="https://github.com/BM-Boris/netan">github.com/BM-Boris/rodin</Link>
             </Typography>
           </CardContent>
         </Card>

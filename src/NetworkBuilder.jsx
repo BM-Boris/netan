@@ -22,7 +22,7 @@ import DataUploadWithType from './DataUploadWithType';
 import ParametersForm from './ParametersForm';
 import NetworkPlot from './NetworkPlot';
 
-const API = 'http://10.66.12.136/api/build-network/';
+const API = 'http://10.66.12.172:80/api/build-network/';
 
 const NetworkBuilder = () => {
   // ───────── Local state ───────────────────────────────────────────────────
@@ -325,8 +325,9 @@ const NetworkBuilder = () => {
         <Box sx={{ width: '100%', mt: 3.5 }}>
           <LinearProgress
             color="secondary"
-            variant="determinate"
+            variant="buffer"
             value={progress}
+            valueBuffer={progress+5}
           />
           <Typography align="center" sx={{ mt: 0.5 }}>
             {progress.toFixed(0)} %
