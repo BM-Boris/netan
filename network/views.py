@@ -36,6 +36,8 @@ import rodin  # internal library
 # ──────────────────────────────────────────────────────────────────────────────
 TASKS: dict[str, Dict] = {}          # {id:{status,progress,cancelled,…}}
 TASKS_LOCK = threading.Lock()
+JOBLIB_N_JOBS = min(4, os.cpu_count() or 1)
+
 
 MAX_EDGES = 10_000  # Plotly starts lagging badly above this number
 SINGLE_OMIC_GUARD = (
@@ -293,7 +295,7 @@ def _clr(
             raise RuntimeError("cancelled by user")
 
         cols = range(start, min(start + chunk, p))
-        res  = Parallel(n_jobs=-1, prefer="threads")(
+        res  = Parallel(n_jobs=JOBLIB_N_JOBS, prefer="threads")(
             delayed(mi_column)(j) for j in cols
         )
         MI[:, cols] = np.column_stack(res)     # shape (p, chunk)
@@ -361,7 +363,6 @@ def _rf(
         mdl = ExtraTreesRegressor(
             n_estimators=n_estimators,
             max_depth=max_depth,
-            n_jobs=-1,
             random_state=1,
             max_features="sqrt"
         )
@@ -375,7 +376,7 @@ def _rf(
             raise RuntimeError("cancelled by user")
 
         idx  = range(start, min(start + chunk, p))
-        rows = Parallel(n_jobs=-1, prefer="threads")(
+        rows = Parallel(n_jobs=JOBLIB_N_JOBS, prefer="threads")(
             delayed(fit_target)(t) for t in idx
         )
         for t, row in rows:
