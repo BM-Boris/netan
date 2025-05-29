@@ -1,10 +1,10 @@
 {
   "files": {
-    "main.js": "/netan/static/js/main.7bfdcb80.js",
+    "main.js": "/netan/static/js/main.fecd6d44.js",
     "index.html": "/netan/index.html",
-    "main.7bfdcb80.js.map": "/netan/static/js/main.7bfdcb80.js.map"
+    "main.fecd6d44.js.map": "/netan/static/js/main.fecd6d44.js.map"
   },
   "entrypoints": [
-    "static/js/main.7bfdcb80.js"
+    "static/js/main.fecd6d44.js"
   ]
 }
