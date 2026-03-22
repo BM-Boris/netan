@@ -251,7 +251,6 @@ def _graph_metrics_impl(
     active_nodes = int(stats.get("nodesWithEdges", 0))
     isolate_count = int(info.get("isolate_count", max(num_nodes - active_nodes, 0)))
     active_fraction = float(active_nodes / num_nodes) if num_nodes else 0.0
-    isolate_fraction = float(isolate_count / num_nodes) if num_nodes else 0.0
     deg = np.asarray([float(d) for _, d in G.degree() if d > 0], dtype=np.float32)
     if deg.size == 0:
         mean_degree_active, median_degree_active, max_degree_active = 0.0, 0.0, 0.0
@@ -270,8 +269,6 @@ def _graph_metrics_impl(
         "density_all": float(stats.get("densityAll", 0.0)),
         "density_active": float(stats.get("densityActive", 0.0)),
         "active_fraction": active_fraction,
-        "isolate_fraction": isolate_fraction,
-        "retain": 1.0 - isolate_fraction,
         "mean_degree_active": mean_degree_active,
         "median_degree_active": median_degree_active,
         "max_degree_active": max_degree_active,
@@ -625,11 +622,6 @@ def _evaluate_tune_candidate_impl(
         row.update({key: val for key, val in metrics.items() if not str(key).startswith("_")})
         row["_edge_set"] = metrics["_edge_set"]
         row["_module_map"] = metrics["_module_map"]
-    else:
-        stats = cand._graph_stats(graph_name)
-        num_nodes = int(stats.get("numNodes", 0))
-        isolate_count = int(info.get("isolate_count", max(num_nodes - int(stats.get("nodesWithEdges", 0)), 0)))
-        row["isolate_fraction"] = float(isolate_count / num_nodes) if num_nodes else 0.0
     return _mask_inactive_threshold_fields(row)
 
 
@@ -784,6 +776,18 @@ def _score_snapshot_row_impl(
     return _mask_inactive_threshold_fields(row)
 
 
+def _public_tune_row_impl(row: Dict[str, Any]) -> Dict[str, Any]:
+    out = {
+        key: value
+        for key, value in row.items()
+        if not str(key).startswith("_")
+        and key not in {"modularity01", "ari01", "assort01"}
+    }
+    if "modularity01" in row:
+        out["modularity"] = row["modularity01"]
+    return out
+
+
 def _build_tune_grid_impl(
     nt: "Any",
     *,
@@ -927,7 +931,7 @@ def _build_tune_grid_impl(
         raise RuntimeError("All refined grid candidates failed.")
 
     _update_tune_stability_impl(final_rows, groups=refine_groups)
-    public_table = pd.DataFrame([{k: v for k, v in row.items() if not str(k).startswith("_")} for row in final_rows])
+    public_table = pd.DataFrame([_public_tune_row_impl(row) for row in final_rows])
     fail_df = pd.DataFrame(failures)
     grid = {
         "kind": "tune_grid",
@@ -1021,7 +1025,7 @@ def _score_tune_grid_impl(
     final_rows.sort(key=lambda row: float(row["score"]), reverse=True)
     best_row = final_rows[0]
 
-    out = pd.DataFrame([{k: v for k, v in row.items() if not str(k).startswith("_")} for row in final_rows])
+    out = pd.DataFrame([_public_tune_row_impl(row) for row in final_rows])
     keep = min(max(int(top_results), 1), len(out))
     leaderboard = out.head(keep).reset_index(drop=True)
     fail_df = pd.DataFrame(grid.get("failures") or [])
@@ -1046,7 +1050,7 @@ def _score_tune_grid_impl(
         "applied": bool(applied),
         "best_build_params": dict(best_row["_build_params"]),
         "best_adjust_params": dict(best_row["_adjust_params"]),
-        "best_metrics": {k: v for k, v in best_row.items() if not str(k).startswith("_")},
+        "best_metrics": _public_tune_row_impl(best_row),
         "table": leaderboard,
         "failures": fail_df,
         "weights": weights_public,

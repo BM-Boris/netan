@@ -350,7 +350,6 @@ def _feature_results_bundle(nt: "Netan", *, require: bool = False) -> Dict[str, 
             "table": pd.DataFrame(),
             "graph": None,
             "label": None,
-            "mode": "none",
         }
 
     if has_rank and has_stability:
@@ -394,7 +393,6 @@ def _feature_results_bundle(nt: "Netan", *, require: bool = False) -> Dict[str, 
             "table": _feature_identity_index(merged),
             "graph": rank_graph,
             "label": rank_label,
-            "mode": "combined",
         }
 
     if has_rank:
@@ -402,14 +400,12 @@ def _feature_results_bundle(nt: "Netan", *, require: bool = False) -> Dict[str, 
             "table": _feature_identity_index(rank_table.copy()),
             "graph": rank_cached.get("graph"),
             "label": rank_cached.get("label"),
-            "mode": "rank",
         }
 
     return {
         "table": _feature_identity_index(_stability_feature_view(stab_table, rename_feature=False)),
         "graph": stab_cached.get("graph"),
         "label": stab_cached.get("label"),
-        "mode": "stability",
     }
 
 def _clear_sample_views(nt: "Netan") -> None:
@@ -665,7 +661,7 @@ def _public_score_metrics(
     include_stats: bool = True,
 ) -> Dict[str, Any]:
     out = {key: metrics[key] for key in ("nodes", "edges", "active_nodes", "mean_degree_active", "median_degree_active", "max_degree_active", "modules", "communities", "isolates", "density_active") if include_stats and key in metrics}
-    out.update({key: metrics[key] for key in ("score", "structure", "sep", "stab", "active_fraction", "retain") if key in metrics})
+    out.update({key: metrics[key] for key in ("score", "structure", "sep", "stab", "active_fraction") if key in metrics})
     out.update({label: metrics[src] for label, src in (("modularity", "modularity01"), ("degree_band", "degree_band"), ("module_size_band", "module_size_band")) if src in metrics})
     if objective == "supervised":
         out.update({key: metrics[key] for key in ("ari", "nmi", "label_assortativity") if key in metrics})
@@ -686,7 +682,7 @@ def _format_score_parts(metrics: Dict[str, Any], objective: str) -> List[str]:
             )
         )
     parts.extend(f"{label}={float(metrics.get(label, 0.0)):.4f}" for label in ("module_stability", "edge_stability"))
-    parts.extend(["\n", f"active_fraction={float(metrics.get('active_fraction', 0.0)):.4f}", f"retain={float(metrics.get('retain', 0.0)):.4f}"])
+    parts.extend(["\n", f"active_fraction={float(metrics.get('active_fraction', 0.0)):.4f}"])
     return parts
 
 def _fmt_method_params(items: Dict[str, Any]) -> str:

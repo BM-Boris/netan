@@ -1028,7 +1028,6 @@ class Netan:
         out["community"] = out["_sample_id"].map(lambda x: node_map.get(x, {}).get("community"))
         out["module"] = out["_sample_id"].map(lambda x: node_map.get(x, {}).get("module"))
         out = out.drop(columns=["_sample_id"])
-        out["graph"] = graph_name
         self._results()["samples"] = out
         return out
 
@@ -1938,7 +1937,6 @@ class Netan:
                 "[Netan.shortlist] "
                 + " | ".join(
                     [
-                        f"mode={bundle.get('mode')}",
                         f"features={int(len(picked))}",
                         f"layers={','.join(names_new)}",
                         f"per_layer={bool(per_layer)}",
