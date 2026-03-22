@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "netan"
-version = "2.01"
+version = "2.1.1"
 description = "Network builder for multi-omics matrices."
 readme = "README.md"
 authors = [{name = "Boris Minasenko"}]
@@ -15,7 +15,7 @@ dependencies = [
   "pandas>=1.5",
   "networkx>=3.0",
   "scikit-learn>=1.2",
-  "plotly<=5.0",
+  "plotly>=5.19,<6",
   "rodin>=1.9.10",
   "joblib>=1.2",
   "tqdm>=4.65",
