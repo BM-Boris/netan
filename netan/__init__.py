@@ -1,3 +1,3 @@
-from .netan import create, Netan
+from .netan import create, load, Netan
 
-__all__ = ["create", "Netan"]
+__all__ = ["create", "load", "Netan"]

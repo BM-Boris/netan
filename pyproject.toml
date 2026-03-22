@@ -4,13 +4,18 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "netan"
-version = "1.2"
-description = "Network builder for multi-omics matrices (Rodin-compatible)."
+version = "2.0"
+description = "Network builder for multi-omics matrices."
 readme = "README.md"
 authors = [{name = "Boris Minasenko"}]
 license = {text = "MIT"}
 requires-python = ">=3.10"
 dependencies = [
+  "numpy>=1.23",
+  "pandas>=1.5",
+  "networkx>=3.0",
+  "scikit-learn>=1.2",
+  "plotly<=5.0",
   "rodin>=1.9.10",
   "joblib>=1.2",
   "tqdm>=4.65",
@@ -18,4 +23,4 @@ dependencies = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/BM-Boris/netan-lib"
+Homepage = "https://github.com/BM-Boris/netan"
