@@ -73,24 +73,22 @@ If you do not pass thresholds, `netan` sparsifies automatically through `auto_ta
 nt.info()
 nt.params()
 nt.scores()
-edges = nt.edges()
+nt.edges()
 ```
 
 ### Tune
 
 ```python
-tbl = nt.tune(label="Group", apply=False)
-best = nt.best()
-nt.materialize()
+nt.tune(label="Group")
+nt.best()
 ```
 
 For repeated score iteration on the same candidate space:
 
 ```python
-g = nt.grid()
+nt.grid()
 
-tbl = nt.scores_grid(
-    g,
+nt.scores_grid(
     label="Group",
     weights={
         "sep": [15, 5, 80],
@@ -98,14 +96,14 @@ tbl = nt.scores_grid(
     },
 )
 
-nt.materialize(candidate=0)
+nt.materialize()
 ```
 
 ### Rank and shortlist
 
 ```python
-ranked = nt.rank("Group")
-stable = nt.stability_rank("Group")
+nt.rank("Group")
+nt.stability_rank("Group")
 nt_small = nt.shortlist(p_adj_max=0.01)
 ```
 
@@ -151,7 +149,7 @@ This makes it practical to iterate on score weights without rerunning inference.
 ## Visualization and export
 
 ```python
-fig = nt.plot(layout="spring", color="Group")
+nt.plot(layout="kamada_kawai", color="Group")
 nt.export("edges.csv")
 ```
 
