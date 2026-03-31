@@ -516,32 +516,26 @@ class Netan:
         ``method='rf', n_estimators=320, max_depth=8``, and
         ``method='glasso', alpha=0.05, max_iter=200, tol=1e-4``.
 
-        ``thr_raw`` is method-scale specific, so there is no universal cutoff
-        across methods. Prefer ``thr_norm`` when you want more comparable
-        behavior across ``spearman``, ``clr``, ``rf``, and ``glasso``.
-        Rough starting ranges for ``thr_raw`` are often around ``0.3`` to
-        ``0.8`` for ``spearman`` and ``0.01`` to ``0.2`` for ``glasso``.
-        In samples mode, Netan also syncs graph-level ``community`` and
-        ``module`` labels back into each ``rodin.samples`` table under
-        ``netan_<graph>_...`` columns.
+        ``thr_raw`` is method-scale specific, so it is best used when you
+        already know the scale of a given method. ``thr_norm`` is easier to
+        compare across ``spearman``, ``clr``, ``rf``, and ``glasso`` because
+        it works on the normalized similarity matrix. In samples mode, Netan
+        also syncs graph-level ``community`` and ``module`` labels back into
+        each ``rodin.samples`` table under ``netan_<graph>_...`` columns.
 
         Methodology
         -----------
-        Each method first computes a full similarity matrix ``W_raw``. Netan
-        then derives ``W_norm``, a monotonic normalization of ``abs(W_raw)``
-        to ``[0, 1]``. If both ``thr_raw`` and ``thr_norm`` are provided, an
-        edge must pass both. ``k`` is applied after thresholding.
+        Netan first builds a full similarity matrix ``W_raw`` and then a
+        normalized version ``W_norm`` on ``[0, 1]``. Thresholding is applied
+        on ``thr_raw`` and-or ``thr_norm``, followed by optional kNN pruning.
+        If ``k='auto'``, Netan keeps sparse graphs unchanged and otherwise
+        chooses a small degree-aware k capped at ``10``.
 
-        When ``k='auto'``, Netan inspects the thresholded graph: if
-        ``mean_degree_active <= 5``, no extra kNN pruning is used; otherwise
-        it sets ``k = 3 + floor(sqrt(mean_degree_active - 5))``, capped by
-        ``ceil(median_degree_active)``, ``active_nodes - 1``, and ``10``.
-
-        In multilayer samples mode, layer graphs are direct, ``fused`` is
-        built from fused full layer matrices and then sparsified, and
-        ``entire`` and ``consensus`` are derived from layer graphs. In
-        multilayer features mode, layer graphs and ``cross`` are direct, while
-        ``entire`` is derived from layers and ``cross``.
+        In multilayer samples mode, layer graphs are built directly, ``fused``
+        is built from fused layer matrices, and ``entire`` / ``consensus`` are
+        derived from the layer graphs. In multilayer features mode, layer
+        graphs and ``cross`` are direct, while ``entire`` is derived from the
+        layer graphs together with ``cross``.
 
         Returns
         -------
@@ -687,25 +681,23 @@ class Netan:
 
         Notes
         -----
-        Direct graphs (layer graphs, ``fused``, ``cross``, and stack
-        ``entire``) are rebuilt directly from their cached matrices. Derived
-        graphs (samples multilayer ``entire`` and ``consensus``, and features
-        multilayer ``entire``) rebuild through the layer graphs they depend on.
+        ``adjust()`` does not rerun network inference. It reuses the matrices
+        already stored by ``build()`` and only changes sparsification-related
+        settings.
 
-        For derived graphs, ``thr_raw``, ``thr_norm``, ``auto_target``, ``k``,
-        ``mutual``, and ``attach_isolates`` are applied to those contributing
-        layer graphs first, then the requested derived graph is rebuilt from
-        them. In samples mode, rebuilt graph labels are also synced
-        automatically into each ``rodin.samples`` table under
-        ``netan_<graph>_...`` columns. Graph-dependent cached scores, tuning
-        results, and sample-graph rankings are invalidated.
+        Direct graphs are rebuilt directly from their own cached matrices.
+        Derived graphs are rebuilt through the support graphs they depend on.
+        In samples mode, rebuilt graph labels are synced automatically into
+        each ``rodin.samples`` table. Graph-dependent cached scores and tuning
+        results are dropped, while existing feature-ranking caches are kept
+        until a new incompatible ``rank()`` or ``stability_rank()`` run
+        replaces them.
 
         Methodology
         -----------
-        ``k='auto'`` uses the same rule as ``build()``: no extra kNN is used
-        when ``mean_degree_active <= 5``; otherwise
-        ``k = 3 + floor(sqrt(mean_degree_active - 5))``, capped by
-        ``ceil(median_degree_active)``, ``active_nodes - 1``, and ``10``.
+        ``adjust()`` follows the same thresholding and optional auto-kNN logic
+        as ``build()``, but starts from cached matrices instead of recomputing
+        them.
 
         Returns
         -------
@@ -1250,8 +1242,8 @@ class Netan:
         weights : dict, default=None
             Optional score-weight overrides. Blocks can be provided as
             sequences or dicts, for example ``{'sep': [15, 5, 80]}``,
-            ``{'structure_supervised': [50, 35, 15]}``,
-            ``{'structure_unsupervised': [40, 35, 25]}``, or
+            ``{'structure_supervised': [20, 20, 60]}``,
+            ``{'structure_unsupervised': [20, 20, 60]}``, or
             ``{'supervised': [60, 15, 15, 10]}``. Supported blocks are
             ``structure_supervised``, ``structure_unsupervised``,
             ``stab_supervised``, ``stab_unsupervised``, ``sep``,
@@ -1263,14 +1255,17 @@ class Netan:
         Notes
         -----
         ``scores()`` uses the same final ``score`` that decides the winner in
-        ``tune()`` and ``scores_grid()``. For the selected graph, local
-        stability is estimated across the same refine-style neighborhood that
-        ``tune()`` explores around the current configuration. When
-        ``weights`` is omitted, the default library weights are used. The
-        resulting one-row table is cached in ``self._results()['scores']``.
+        ``tune()`` and ``scores_grid()``. This makes it the easiest way to
+        inspect how the current active graph would be judged by the tuning
+        objective. The resulting one-row table is cached in
+        ``self._results()['scores']``.
 
         Methodology
         -----------
+        The final score combines graph structure, local stability, and, in
+        supervised mode, label separation. All internal normalized terms used
+        in these formulas are clipped to ``[0, 1]``.
+
         Unsupervised ``score`` is
 
         ``structure = 0.20 * modularity01 + 0.20 * degree_band``
@@ -1280,15 +1275,15 @@ class Netan:
 
         Supervised ``score`` is
 
-        ``structure = 0.20 * modularity01 + 0.20 * degree_band``
-        ``+ 0.60 * module_size_band``
+        ``structure = 0.20 * modularity01 + 0.20 * degree_band + 0.60 * module_size_band``
         ``sep = 0.15 * ari01 + 0.05 * nmi + 0.80 * assort01``
         ``stab = 0.30 * module_stability + 0.70 * edge_stability``
-        ``score = 0.60 * sep + 0.15 * structure + 0.15 * stab``
-        ``+ 0.10 * active_fraction``.
+        ``score = 0.60 * sep + 0.15 * structure + 0.15 * stab + 0.10 * active_fraction``.
 
         Here ``ari01 = clip(max(ARI, 0), 0, 1)`` and
         ``assort01 = clip((label_assortativity + 1) / 2, 0, 1)``.
+        ``module_stability`` and ``edge_stability`` are estimated from the
+        same local neighborhood that tuning uses around the current graph.
 
         Returns
         -------
@@ -1379,10 +1374,12 @@ class Netan:
 
         Methodology
         -----------
-        For each feature vector ``x``, Netan computes class-specific
-        within-label dispersion ``W_c`` and pair-specific cross-label
-        dispersion ``B_cd`` over graph edges using weighted squared
-        differences ``w_ij * (x_i - x_j)^2``. The score is
+        For each feature vector ``x``, Netan scores how much values differ
+        across class boundaries relative to within-class variation on the
+        selected graph. Over graph edges, it computes weighted squared
+        differences ``w_ij * (x_i - x_j)^2`` and summarizes them as
+        class-specific within-class dispersion ``W_c`` and pair-specific
+        between-class dispersion ``B_cd``. The main multiclass score is
 
         ``score = sum_{c<d} beta_cd * (log1p(B_cd) - 0.5 * (log1p(W_c) + log1p(W_d)))``
 
@@ -1391,14 +1388,13 @@ class Netan:
         samples in class ``c`` and ``s_cd`` is the available edge support for
         the contrasted pair, defined as the minimum of the pair's cross-class
         support and the two classes' within-class support. In the binary case,
-        this reduces to a single contrast between the two classes. High scores
-        therefore mean larger variation across class boundaries together with
-        smaller within-class variation in the contrasted classes. When a
-        selected graph is too sparse to support any valid class pair with both
-        cross-class edges and class-specific within-class support, Netan falls
-        back to a pooled within-vs-cross statistic on the same weighted edge
-        differences.
-        ``p_perm`` is estimated by label
+        this reduces to a single contrast between the two classes.
+
+        High scores therefore mean larger variation across class boundaries
+        together with smaller within-class variation in the contrasted
+        classes. If the selected graph is too sparse to support any valid
+        class pair, Netan falls back to a pooled within-vs-cross statistic on
+        the same weighted edge differences. ``p_perm`` is estimated by label
         permutation on the same score statistic, and ``p_adj`` is
         Benjamini-Hochberg FDR.
 
@@ -1527,13 +1523,14 @@ class Netan:
 
         Methodology
         -----------
-        The graph is kept fixed. Each iteration samples a subset of labeled
-        nodes, builds the induced subgraph, and reruns the same edge-based
-        ranking used by ``rank()``. The final table aggregates selection
-        frequency, mean rank, median rank, mean score, and score spread. The
-        latest stability result is also synced automatically back into each
-        ``rodin.features`` table under ``netan_*`` analytical columns such as
-        ``netan_stability_rank`` and ``netan_selected_freq``.
+        The graph itself is kept fixed. Each iteration samples a subset of
+        labeled nodes, builds the induced subgraph, and reruns the same
+        edge-based ranking used by ``rank()``. The final table summarizes how
+        often each feature is selected and how stable its score and rank are
+        across iterations. The latest stability result is also synced
+        automatically back into each ``rodin.features`` table under
+        ``netan_*`` analytical columns such as ``netan_stability_rank`` and
+        ``netan_selected_freq``.
 
         Returns
         -------
@@ -2079,15 +2076,11 @@ class Netan:
 
         Notes
         -----
-        ``grid()`` does the expensive part of ``tune()``: it builds base
-        network states, applies the coarse adjust grid, runs the local refine
-        neighborhood, and caches every final candidate together with its graph
-        structure and unsupervised metrics. The full grid bundle is cached in
-        ``self._cache['tune_grid']`` and the public summary table is cached in
-        ``self._results()['grid']['table']``, so subsequent ``scores_grid()``
-        and ``materialize()`` calls can omit ``grid``. Use ``scores_grid()``
-        to score the same grid repeatedly with default or custom weights
-        without rerunning inference.
+        ``grid()`` does the expensive search construction once. Use it when
+        you want to build a candidate set and then rescore or materialize
+        those candidates repeatedly without rerunning network inference. The
+        returned bundle can be passed into ``scores_grid()`` and
+        ``materialize()`` directly.
 
         Returns
         -------
@@ -2142,8 +2135,8 @@ class Netan:
             or dicts. For example,
             ``{'sep': [15, 5, 80], 'supervised': [60, 15, 15, 10]}``
             overrides the supervised score, while
-            ``{'structure_supervised': [50, 35, 15],``
-            ``'structure_unsupervised': [40, 35, 25]}``
+            ``{'structure_supervised': [20, 20, 60],``
+            ``'structure_unsupervised': [20, 20, 60]}``
             overrides objective-specific structure blocks. Supported blocks
             are ``structure_supervised``, ``structure_unsupervised``,
             ``stab_supervised``, ``stab_unsupervised``, ``sep``,
@@ -2158,24 +2151,17 @@ class Netan:
 
         Notes
         -----
-        ``scores_grid()`` reuses the already built candidate grid and only
-        recomputes label-dependent terms plus the final weighted score. This
-        makes weight iteration cheap compared with rebuilding the full search.
-        When ``grid`` is omitted, the latest grid previously built on this
-        object is used. The returned public leaderboard is also cached in
-        ``self._results()['scores_grid']['table']``. The same latest winner
-        payload is mirrored into ``self._results()['tune']`` so that
-        ``best()`` can inspect the current winner consistently. The latest
-        leaderboard is also stored on the grid itself in
-        ``grid['last_scores']['leaderboard']`` so ``materialize(candidate=0)``
-        can resolve zero-based leaderboard rows after a scoring run.
+        ``scores_grid()`` reuses an existing grid and only recomputes the
+        label-dependent terms and final weighted score. This makes it useful
+        when you want to change ``label`` or ``weights`` without rebuilding
+        the whole search. The latest winner is also what ``best()`` reports.
 
         Example
         -------
         ``nt.scores_grid(label='Source', weights={'sep': [15, 5, 80],``
-        ``'structure_supervised': [50, 35, 15], 'structure_unsupervised':``
-        ``[40, 35, 25], 'stab_supervised': [55, 45],``
-        ``'stab_unsupervised': [70, 30], 'supervised': [60, 15, 15, 10],``
+        ``'structure_supervised': [20, 20, 60], 'structure_unsupervised':``
+        ``[20, 20, 60], 'stab_supervised': [30, 70],``
+        ``'stab_unsupervised': [30, 70], 'supervised': [60, 15, 15, 10],``
         ``'unsupervised': [50, 40, 10]})``
         rescales supervised ranking on the already built grid without
         rebuilding candidates.
@@ -2234,12 +2220,10 @@ class Netan:
 
         Notes
         -----
-        When ``grid`` is omitted, the latest grid previously built on this
-        object is used. After ``scores_grid(apply=False)`` or
-        ``tune(apply=False)``, calling ``materialize()`` with no explicit
-        candidate applies the latest winner from that cached grid and cached
-        leaderboard. Use ``materialize(candidate=0)`` for the first leaderboard
-        row, ``materialize(candidate=1)`` for the second, and so on.
+        When ``candidate=None``, ``materialize()`` uses the latest winner from
+        ``scores_grid()`` or ``tune()``. If an integer is provided, it first
+        refers to the latest leaderboard row when available, and otherwise to
+        the stored grid candidate id or full-grid position.
         """
         grid_bundle = _cached_tune_grid(self) if grid is None else grid
         candidate_nt = _materialize_grid_candidate(grid_bundle, candidate=candidate)
@@ -2329,8 +2313,8 @@ class Netan:
             Blocks can be provided as sequences or dicts, for example
             ``{'sep': [15, 5, 80]}``, ``{'supervised': [60, 15, 15, 10]}``,
             or objective-specific blocks such as
-            ``{'structure_supervised': [50, 35, 15]}`` and
-            ``{'structure_unsupervised': [40, 35, 25]}``. Supported blocks are
+            ``{'structure_supervised': [20, 20, 60]}`` and
+            ``{'structure_unsupervised': [20, 20, 60]}``. Supported blocks are
             ``structure_supervised``, ``structure_unsupervised``,
             ``stab_supervised``, ``stab_unsupervised``, ``sep``,
             ``supervised``, and ``unsupervised``.
@@ -2356,11 +2340,6 @@ class Netan:
         ``attach_isolates`` can each be a single value or a sequence of values
         to search.
 
-        In samples multilayer mode, ``graph='fused'`` is tuned directly, while
-        ``graph='entire'`` and ``graph='consensus'`` are tuned through the
-        layer graphs they are built from and then rescored after cascade
-        rebuild.
-
         If the current object contains only one layer, including objects
         returned by ``shortlist()`` after one-layer filtering, ``tune()``
         restricts search to single-layer ``stack`` / ``entire`` candidates.
@@ -2368,72 +2347,48 @@ class Netan:
         Methodology
         -----------
         ``tune()`` is a convenience wrapper around ``grid()`` followed by
-        ``scores_grid()``. Stage 1 first builds base network states across
-        ``methods x method_grids x layer_modes x combine``. It then applies the
-        coarse adjust grid on top of each built state using ``adjust()``, i.e.
-        over ``auto_target``, ``thr_norm``, ``thr_raw``, ``k``, ``mutual``,
-        ``attach_isolates``, and ``min_layers`` when relevant. Direct graphs
-        are adjusted directly. Derived graphs are adjusted through the support
-        graphs they depend on and then cascaded to the target graph.
+        ``scores_grid()``.
 
-        Stage 2 refines every stage-1 candidate locally without rerunning
-        inference and scores each refined candidate with the same final score
-        used by ``scores()``. For
-        ``family='auto'``, refine uses
-        ``auto_target in [center-0.02, center-0.01, center,``
-        ``center+0.01, center+0.02]`` clipped to ``[1e-6, 1]``. For
-        ``family='manual'``, refine uses
+        Stage 1 builds base network states across
+        ``methods x method_grids x layer_modes x combine`` and then applies a
+        coarse ``adjust()`` search over ``auto_target``, ``thr_norm``,
+        ``thr_raw``, ``k``, ``mutual``, ``attach_isolates``, and
+        ``min_layers`` when relevant.
+
+        Stage 2 locally refines every stage-1 candidate without rerunning
+        inference. For ``family='auto'``, refine tries
+        ``auto_target in [center-0.02, center-0.01, center, center+0.01, center+0.02]``.
+        For ``family='manual'``, refine tries
         ``thr_raw in [0.93, 0.97, 1.00, 1.03, 1.07] * center`` when
-        ``thr_raw`` was active in the seed, and if ``thr_norm`` was active in
-        the seed, it uses
-        ``thr_norm in [center-0.02, center-0.01, center,``
-        ``center+0.01, center+0.02]``. Refine also tries
-        ``k`` from the seed request, ``None``, ``'auto'``, and when an
-        effective kNN was active, ``k_eff-2``, ``k_eff-1``, ``k_eff``,
-        ``k_eff+1``, and ``k_eff+2`` clipped to ``[2, 10]``. If ``mutual``
-        was not pinned by the user,
-        refine tries both ``False`` and ``True`` whenever ``k`` is active.
-        For ``consensus``, refine keeps the seed ``min_layers`` fixed.
+        ``thr_raw`` is active, and similarly
+        ``thr_norm in [center-0.02, center-0.01, center, center+0.01, center+0.02]``
+        when ``thr_norm`` is active. Refine also explores
+        ``k`` around the current setting and, unless pinned by the user,
+        both ``mutual=False`` and ``mutual=True`` when kNN is active.
 
-        Stage 2 ranks all refine candidates by the final ``score``. If
-        ``weights`` is omitted, the default library weights are used.
-        Unsupervised scoring is
+        All stage-2 candidates are ranked by the same final ``score`` used by
+        ``scores()``. If ``weights`` is omitted, the default library weights
+        are used. Unsupervised scoring is
 
-        ``structure = 0.20 * modularity01 + 0.20 * degree_band``
-        ``+ 0.60 * module_size_band``
+        ``structure = 0.20 * modularity01 + 0.20 * degree_band + 0.60 * module_size_band``
         ``stab = 0.30 * module_stability + 0.70 * edge_stability``
         ``score = 0.50 * structure + 0.40 * stab + 0.10 * active_fraction``.
 
         Supervised scoring is
 
-        ``structure = 0.20 * modularity01 + 0.20 * degree_band``
-        ``+ 0.60 * module_size_band``
+        ``structure = 0.20 * modularity01 + 0.20 * degree_band + 0.60 * module_size_band``
         ``sep = 0.15 * ari01 + 0.05 * nmi + 0.80 * assort01``
         ``stab = 0.30 * module_stability + 0.70 * edge_stability``
-        ``score = 0.60 * sep + 0.15 * structure + 0.15 * stab``
-        ``+ 0.10 * active_fraction``.
+        ``score = 0.60 * sep + 0.15 * structure + 0.15 * stab + 0.10 * active_fraction``.
 
         Here ``ari01 = clip(max(ARI, 0), 0, 1)`` and
         ``assort01 = clip((label_assortativity + 1) / 2, 0, 1)``.
-        ``scores()`` estimates ``module_stability`` and ``edge_stability``
-        across the same nearby refine-style neighborhood around the current
-        candidate, while ``tune()`` estimates them across the stage-2 local
-        refine neighborhood already generated for that candidate family.
-        The winning configuration is therefore both strong and locally stable.
-        The returned leaderboard is the same object as
-        ``self._results()['scores_grid']['table']``, the mirrored winner
-        summary is stored in ``self._results()['tune']``, and after
-        ``tune(apply=False)`` you can call ``materialize()`` or
-        ``materialize(candidate=0)`` to apply a leaderboard row later.
 
-        ``tune()`` caches the full candidate grid in
-        ``self._cache['tune_grid']`` through ``grid()``. The returned
-        leaderboard is cached in ``self._results()['scores_grid']['table']``
-        and the latest winner payload is mirrored into ``self._results()['tune']``.
-        If ``apply=False``, you can later call ``materialize()`` to apply the
-        latest winner from ``tune()`` or ``materialize(candidate=0)`` to apply
-        the first leaderboard row. With the default ``apply=True``, the winner
-        is already applied to the current object.
+        The winning configuration is therefore the candidate that combines
+        strong structure or label separation with strong local stability.
+        With ``apply=True``, that winner is applied immediately to the current
+        object. With ``apply=False``, you can inspect the leaderboard and then
+        apply a row later with ``materialize()``.
 
         Returns
         -------

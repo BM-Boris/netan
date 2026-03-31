@@ -45,7 +45,6 @@ nt.build(
     method="spearman",
     node_mode="samples",
     layer_mode="multilayer",
-    graph="entire",
 )
 
 nt.plot(color="Group", title="Sample network")
@@ -60,7 +59,6 @@ nt.build(
     method="rf",
     node_mode="samples",
     layer_mode="multilayer",
-    graph="entire",
     k="auto",
 )
 ```
