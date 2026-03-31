@@ -31,6 +31,29 @@
   document.addEventListener('DOMContentLoaded', addWidgetsRenderer);
 }());
 </script>
+<script>
+(function() {
+  function wrapGuideTables() {
+    document.querySelectorAll('.jp-RenderedHTMLCommon table').forEach(function(table) {
+      var host = table.parentElement && table.parentElement.matches('.jp-RenderedHTMLCommon')
+        ? table
+        : table.parentElement;
+
+      if (!host || host.closest('.guide-table-scroll')) {
+        return;
+      }
+
+      var wrapper = document.createElement('div');
+      wrapper.className = 'guide-table-scroll';
+      host.parentNode.insertBefore(wrapper, host);
+      wrapper.appendChild(host);
+    });
+  }
+
+  document.addEventListener('DOMContentLoaded', wrapGuideTables);
+  window.addEventListener('load', wrapGuideTables);
+}());
+</script>
 <style type="text/css">
     pre { line-height: 125%; }
 td.linenos .normal { color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px; }
@@ -91,6 +114,50 @@ a hack to deal with our current css styles and no new styling should be added in
 }
 #jupyter-main-app {
     position: relative;
+}
+
+body.jp-Notebook,
+.jp-RenderedHTMLCommon,
+.jp-MarkdownOutput,
+.jp-InputArea,
+.jp-InputPrompt,
+.jp-OutputArea,
+.jp-OutputPrompt,
+.jp-OutputArea-output,
+.jp-RenderedText,
+.jp-RenderedHTMLCommon pre,
+.jp-RenderedHTMLCommon code,
+.jp-OutputArea-output pre,
+.jp-OutputArea-output code {
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+}
+
+.guide-table-scroll {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+}
+
+.guide-table-scroll > div,
+.guide-table-scroll > table {
+    width: max-content;
+    min-width: 100%;
+}
+
+.guide-table-scroll table {
+    width: max-content !important;
+    min-width: 100%;
+    max-width: none;
+    table-layout: auto !important;
+}
+
+.guide-table-scroll td,
+.guide-table-scroll th,
+.guide-table-scroll tr {
+    white-space: nowrap;
 }
 
   </style>
