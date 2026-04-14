@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "netan"
-version = "2.1.3"
+version = "2.1.4"
 description = "Network builder for multi-omics matrices."
 readme = "README.md"
 authors = [{name = "Boris Minasenko"}]

@@ -1315,39 +1315,46 @@ def common_samples(objs) -> List[str]:
 
 def _subset_rodin(r, *, features: Optional[Sequence[str]] = None, samples: Optional[Sequence[str]] = None):
     X = _ensure_df(getattr(r, "X", None), "r.X").copy()
-    X.index = X.index.astype(str)
-    X.columns = X.columns.astype(str)
-    feat_ids = list(X.index) if features is None else list(map(str, features))
-    sample_ids = list(X.columns) if samples is None else list(map(str, samples))
+
+    feat_native = list(X.index)
+    samp_native = list(X.columns)
+
+    feat_map = {str(k): k for k in feat_native}
+    samp_map = {str(k): k for k in samp_native}
+
+    feat_ids = feat_native if features is None else [feat_map[str(f)] for f in features if str(f) in feat_map]
+    sample_ids = samp_native if samples is None else [samp_map[str(s)] for s in samples if str(s) in samp_map]
+
     X_sub = X.loc[feat_ids, sample_ids]
+
     try:
         out = r[X_sub]
     except Exception:
         out = copy.deepcopy(r)
-        out.X = X_sub
+
         F = getattr(out, "features", None)
+        F_sub = None
         if isinstance(F, pd.DataFrame):
-            F = F.copy()
-            F.index = F.index.astype(str)
-            out.features = F.loc[[f for f in feat_ids if f in F.index]]
+            F_sub = F.copy().loc[[f for f in feat_ids if f in F.index]]
+
         S = getattr(out, "samples", None)
+        S_sub = None
         if isinstance(S, pd.DataFrame) and not S.empty:
             S = S.copy()
-            detected_ids = _extract_sample_ids_from_df(S)
-            if detected_ids is not None:
-                keep = [s for s in sample_ids if s in set(detected_ids)]
-                aligned = S.assign(_sample_id=list(map(str, detected_ids))).set_index("_sample_id").loc[keep].reset_index()
-                if "id" in aligned.columns:
-                    aligned["id"] = aligned["_sample_id"].astype(str)
-                    aligned = aligned.drop(columns=["_sample_id"])
-                elif len(aligned.columns) > 1 and aligned.iloc[:, 1].astype(str).tolist() == aligned["_sample_id"].astype(str).tolist():
-                    aligned = aligned.drop(columns=["_sample_id"])
-                else:
-                    aligned = aligned.rename(columns={"_sample_id": "id"})
-                out.samples = aligned
+            sid_col = S.columns[0]
+            detected_ids = list(S.iloc[:, 0])
+            detected_map = {str(k): k for k in detected_ids}
+            keep_native = [detected_map[str(s)] for s in sample_ids if str(s) in detected_map]
+            S_sub = S.set_index(sid_col).loc[keep_native].reset_index()
+
+        out._X = X_sub
+        out._features = F_sub
+        out._samples = S_sub
+
     S = getattr(out, "samples", None)
     if isinstance(S, pd.DataFrame):
         out.samples.reset_index(drop=True, inplace=True)
+
     return out
 
 def _derived_graph_info(
