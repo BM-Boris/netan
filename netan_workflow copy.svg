@@ -1,0 +1,393 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="Layer_1" xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 1600 760">
+  <!-- Generator: Adobe Illustrator 30.1.0, SVG Export Plug-In . SVG Version: 2.1.1 Build 136)  -->
+  <defs>
+    <style>
+      .st0 {
+        fill: none;
+      }
+
+      .st1 {
+        font-size: 16.02px;
+      }
+
+      .st1, .st2, .st3, .st4, .st5, .st6 {
+        fill: #3a2418;
+      }
+
+      .st1, .st3, .st4, .st7, .st5, .st6 {
+        isolation: isolate;
+      }
+
+      .st1, .st5 {
+        font-family: ArialMT, Arial;
+      }
+
+      .st8 {
+        fill: #f7cbb5;
+      }
+
+      .st8, .st9, .st10, .st11, .st12, .st13, .st14 {
+        stroke-width: 2.2px;
+      }
+
+      .st8, .st10 {
+        stroke: #d08a2c;
+      }
+
+      .st3 {
+        font-size: 31.6px;
+      }
+
+      .st3, .st4, .st6 {
+        font-family: Arial-BoldMT, Arial;
+        font-weight: 700;
+      }
+
+      .st15 {
+        fill: #c95482;
+      }
+
+      .st9 {
+        fill: #deebff;
+        stroke: #4e7fe0;
+      }
+
+      .st10 {
+        fill: #f9ebca;
+      }
+
+      .st16 {
+        fill: #4e7fe0;
+      }
+
+      .st17 {
+        fill: #2f8d65;
+      }
+
+      .st4 {
+        font-size: 21.64px;
+      }
+
+      .st18 {
+        fill: #2f88a5;
+      }
+
+      .st19 {
+        fill: #d08a2c;
+      }
+
+      .st20 {
+        fill: #8a6b5a;
+      }
+
+      .st5 {
+        font-size: 15.8px;
+      }
+
+      .st11 {
+        fill: #fae3ec;
+        stroke: #c95482;
+      }
+
+      .st12 {
+        fill: #e4f3fb;
+        stroke: #2f88a5;
+      }
+
+      .st21 {
+        fill: #8a5ee2;
+      }
+
+      .st13 {
+        fill: #dcf3e7;
+        stroke: #2f8d65;
+      }
+
+      .st6 {
+        font-size: 32.04px;
+      }
+
+      .st14 {
+        fill: #efe7ff;
+        stroke: #8a5ee2;
+      }
+
+      .st22 {
+        fill: #596981;
+      }
+    </style>
+  </defs>
+  <rect class="st8" x="1087.04" y="142.25" width="135.23" height="96.54"/>
+  <rect class="st10" x="445.16" y="420.91" width="219.69" height="96.98"/>
+  <rect class="st9" x="11.09" y="142.35" width="202.85" height="96.54"/>
+  <g class="st7">
+    <g class="st7">
+      <text class="st3" transform="translate(26.01 175.69) scale(.96 1)"><tspan x="0" y="0">create()</tspan></text>
+    </g>
+  </g>
+  <g class="st7">
+    <g class="st7">
+      <text class="st5" transform="translate(25.46 202.02) scale(.96 1)"><tspan x="0" y="0">Rodin-like inputs</tspan></text>
+    </g>
+    <g class="st7">
+      <text class="st5" transform="translate(25.46 220.98) scale(.96 1)"><tspan x="0" y="0">aligned by shared samples</tspan></text>
+    </g>
+  </g>
+  <rect class="st13" x="273.11" y="142.35" width="202.2" height="96.54"/>
+  <g class="st7">
+    <g class="st7">
+      <text class="st3" transform="translate(298.46 175.69) scale(.96 1)"><tspan x="0" y="0">build()</tspan></text>
+    </g>
+  </g>
+  <g class="st7">
+    <g class="st7">
+      <text class="st5" transform="translate(298.46 202.02) scale(.96 1)"><tspan x="0" y="0">sample or feature graph</tspan></text>
+    </g>
+    <g class="st7">
+      <text class="st5" transform="translate(298.46 220.98) scale(.96 1)"><tspan x="0" y="0">stack or multilayer</tspan></text>
+    </g>
+  </g>
+  <rect class="st12" x="536.43" y="142.44" width="218.56" height="96.54"/>
+  <g class="st7">
+    <g class="st7">
+      <text class="st3" transform="translate(558.78 175.69) scale(.96 1)"><tspan x="0" y="0">inspect</tspan></text>
+    </g>
+  </g>
+  <g class="st7">
+    <g class="st7">
+      <text class="st5" transform="translate(558.78 202.02) scale(.96 1)"><tspan x="0" y="0">info(), params(), samples()</tspan></text>
+    </g>
+    <g class="st7">
+      <text class="st5" transform="translate(558.78 220.98) scale(.96 1)"><tspan x="0" y="0">nodes(), edges()</tspan></text>
+    </g>
+  </g>
+  <rect class="st13" x="814.04" y="142.35" width="215.36" height="96.54"/>
+  <g class="st7">
+    <g class="st7">
+      <text class="st3" transform="translate(829.93 175.69) scale(.96 1)"><tspan x="0" y="0">adjust()</tspan></text>
+    </g>
+  </g>
+  <g class="st7">
+    <g class="st7">
+      <text class="st5" transform="translate(829.93 202.02) scale(.96 1)"><tspan x="0" y="0">change thresholds or kNN</tspan></text>
+    </g>
+    <g class="st7">
+      <text class="st5" transform="translate(829.93 220.98) scale(.96 1)"><tspan x="0" y="0">without rerunning inference</tspan></text>
+    </g>
+  </g>
+  <g class="st7">
+    <g class="st7">
+      <text class="st3" transform="translate(1097.41 175.69) scale(.96 1)"><tspan x="0" y="0">plot()</tspan></text>
+    </g>
+  </g>
+  <g class="st7">
+    <g class="st7">
+      <text class="st5" transform="translate(1099.42 202.02) scale(.96 1)"><tspan x="0" y="0">visualize</tspan></text>
+    </g>
+    <g class="st7">
+      <text class="st5" transform="translate(1099.42 220.98) scale(.96 1)"><tspan x="0" y="0">current graph</tspan></text>
+    </g>
+  </g>
+  <path class="st2" d="M0,0"/>
+  <path class="st2" d="M0,0"/>
+  <path class="st20" d="M531.74,190.61"/>
+  <path class="st20" d="M0,0"/>
+  <path class="st20" d="M802.21,190.61"/>
+  <path class="st20" d="M0,0"/>
+  <path class="st20" d="M1072.67,190.61"/>
+  <path class="st20" d="M0,0"/>
+  <path class="st20" d="M378.76,251.17"/>
+  <rect class="st10" x="273.11" y="421.35" width="108.81" height="96.54"/>
+  <g class="st7">
+    <g class="st7">
+      <text class="st5" transform="translate(464.97 482.43) scale(.96 1)"><tspan x="0" y="0">optional fast re-scoring</tspan></text>
+    </g>
+    <g class="st7">
+      <text class="st5" transform="translate(464.97 501.38) scale(.96 1)"><tspan x="0" y="0">of stored tuning candidate</tspan></text>
+    </g>
+  </g>
+  <rect class="st10" x="273.11" y="289.22" width="411.42" height="96.54"/>
+  <g class="st7">
+    <g class="st7">
+      <text class="st3" transform="translate(287.57 330.86) scale(.96 1)"><tspan x="0" y="0">tune(node_mode=samples)</tspan></text>
+    </g>
+  </g>
+  <g class="st7">
+    <g class="st7">
+      <text class="st5" transform="translate(288.06 360.33) scale(.96 1)"><tspan x="0" y="0">search build + adjust space and rank candidates</tspan></text>
+    </g>
+  </g>
+  <g>
+    <rect class="st10" x="749.33" y="289.22" width="145.65" height="96.54"/>
+    <g class="st7">
+      <g class="st7">
+        <text class="st3" transform="translate(766 327.42) scale(.96 1)"><tspan x="0" y="0">best()</tspan></text>
+      </g>
+    </g>
+    <g class="st7">
+      <g class="st7">
+        <text class="st5" transform="translate(766 353.76) scale(.96 1)"><tspan x="0" y="0">inspect current</tspan></text>
+      </g>
+      <g class="st7">
+        <text class="st5" transform="translate(766 372.72) scale(.96 1)"><tspan x="0" y="0">winner</tspan></text>
+      </g>
+    </g>
+  </g>
+  <rect class="st10" x="726.05" y="421.13" width="206.15" height="96.76"/>
+  <g class="st7">
+    <g class="st7">
+      <text class="st3" transform="translate(742.79 459.37) scale(.96 1)"><tspan x="0" y="0">materialize()</tspan></text>
+    </g>
+  </g>
+  <g class="st7">
+    <g class="st7">
+      <text class="st5" transform="translate(744.79 482.43) scale(.96 1)"><tspan x="0" y="0">apply a stored candidate</tspan></text>
+    </g>
+  </g>
+  <path class="st2" d="M0,0"/>
+  <path class="st20" d="M311.99,383.7"/>
+  <path class="st20" d="M0,0"/>
+  <path class="st20" d="M590.91,383.7"/>
+  <path class="st20" d="M0,0"/>
+  <path class="st20" d="M836.02,383.7"/>
+  <g>
+    <rect class="st11" x="1018.65" y="421.35" width="220.47" height="96.54"/>
+    <g class="st7">
+      <g class="st7">
+        <text class="st3" transform="translate(1038.31 457.64) scale(.96 1)"><tspan x="0" y="0">rank(label)</tspan></text>
+      </g>
+    </g>
+    <g class="st7">
+      <g class="st7">
+        <text class="st5" transform="translate(1038.31 483.97) scale(.96 1)"><tspan x="0" y="0">feature-level class</tspan></text>
+      </g>
+      <g class="st7">
+        <text class="st5" transform="translate(1038.31 502.93) scale(.96 1)"><tspan x="0" y="0">contrast on sample graph</tspan></text>
+      </g>
+    </g>
+  </g>
+  <rect class="st11" x="925.15" y="561.32" width="320.32" height="96.54"/>
+  <g class="st7">
+    <g class="st7">
+      <text class="st3" transform="translate(950.66 597.58) scale(.96 1)"><tspan x="0" y="0">stability_rank(label)</tspan></text>
+    </g>
+  </g>
+  <g class="st7">
+    <g class="st7">
+      <text class="st5" transform="translate(951.61 625.93) scale(.96 1)"><tspan x="0" y="0">subsampling-based</tspan></text>
+    </g>
+    <g class="st7">
+      <text class="st5" transform="translate(951.61 644.89) scale(.96 1)"><tspan x="0" y="0">ranking stability</tspan></text>
+    </g>
+  </g>
+  <g>
+    <rect class="st14" x="656.02" y="559.95" width="197.72" height="99.27"/>
+    <g class="st7">
+      <g class="st7">
+        <text class="st3" transform="translate(673.52 598.95) scale(.96 1)"><tspan x="0" y="0">shortlist()</tspan></text>
+      </g>
+    </g>
+    <g class="st7">
+      <g class="st7">
+        <text class="st5" transform="translate(672.51 627.3) scale(.96 1)"><tspan x="0" y="0">new Netan with selected</tspan></text>
+      </g>
+      <g class="st7">
+        <text class="st5" transform="translate(672.51 646.26) scale(.96 1)"><tspan x="0" y="0">feature subset</tspan></text>
+      </g>
+    </g>
+  </g>
+  <rect class="st14" x="454.74" y="559.95" width="135.23" height="99.38"/>
+  <g class="st7">
+    <g class="st7">
+      <text class="st6" transform="translate(481.98 595.14) scale(.95 1)"><tspan x="0" y="0">build()</tspan></text>
+    </g>
+  </g>
+  <g class="st7">
+    <g class="st7">
+      <text class="st1" transform="translate(478.82 628.45) scale(.95 1)"><tspan x="0" y="0">feature graph</tspan></text>
+    </g>
+    <g class="st7">
+      <text class="st1" transform="translate(478.82 647.67) scale(.95 1)"><tspan x="0" y="0" xml:space="preserve"> on shortlist</tspan></text>
+    </g>
+  </g>
+  <path class="st2" d="M0,0"/>
+  <path class="st2" d="M0,0"/>
+  <path class="st20" d="M565.55,593.46"/>
+  <path class="st20" d="M0,0"/>
+  <path class="st20" d="M0,0"/>
+  <path class="st20" d="M1072.67,568.01"/>
+  <path class="st20" d="M0,0"/>
+  <path class="st20" d="M506.93,920"/>
+  <path class="st20" d="M0,0"/>
+  <path class="st20" d="M1084.89,874.84"/>
+  <path class="st20" d="M255.53,345.78"/>
+  <g class="st7">
+    <g class="st7">
+      <text class="st3" transform="translate(288.53 459.37) scale(.96 1)"><tspan x="0" y="0">grid()</tspan></text>
+    </g>
+  </g>
+  <g class="st7">
+    <g class="st7">
+      <text class="st5" transform="translate(288.06 490.62) scale(.96 1)"><tspan x="0" y="0">search build</tspan></text>
+    </g>
+  </g>
+  <g class="st7">
+    <g class="st7">
+      <text class="st3" transform="translate(464.97 459.21) scale(.96 1)"><tspan x="0" y="0">scores_grid()</tspan></text>
+    </g>
+  </g>
+  <line class="st0" x1="55.65" y1="422.21" x2="190.01" y2="422.21"/>
+  <polygon class="st22" points="221.92 197.54 260.68 197.54 260.68 203.2 270.07 193.83 260.68 184.45 260.68 190.11 221.92 190.11 221.92 197.54"/>
+  <path class="st22" d="M103.85,244.54l-.11,7.51c-.02,2.57.02,5.14.12,7.73.2,5.17.7,10.34,1.55,15.49,1.72,10.26,5,20.5,10.65,29.61,1.38,2.29,2.99,4.43,4.65,6.54,1.73,2.07,3.51,4.02,5.4,5.85,3.78,3.67,7.84,7,12.15,9.98,2.16,1.48,4.36,2.93,6.8,4.18,2.34,1.24,4.75,2.36,7.2,3.34,4.92,1.97,10.05,3.39,15.18,4.36,10.22,1.83,20.32,2.73,30.47,3.4,10.13.65,20.25.98,30.37,1.14,5.06.09,10.12.12,15.17.11l7.58-.04,7.53-.09,2.19-.04.11,5.67c3.1-3.18,6.17-6.38,9.2-9.61-3.22-3.03-6.4-6.08-9.55-9.16l.11,5.67-2.17.04-7.47.09-7.52.04c-5.02,0-10.03-.02-15.04-.11-10.02-.16-20.04-.49-30.01-1.12-9.94-.65-19.94-1.57-29.55-3.29-4.76-.91-9.39-2.19-13.82-3.97-2.22-.89-4.38-1.9-6.49-3.01-2.04-1.05-4.06-2.37-6.06-3.73-3.98-2.74-7.73-5.82-11.18-9.17-1.72-1.68-3.33-3.45-4.84-5.25-1.45-1.85-2.87-3.74-4.1-5.77-5-8.05-8.03-17.35-9.62-26.91-.8-4.79-1.27-9.66-1.46-14.56-.1-2.45-.13-4.91-.12-7.38l.11-7.59-7.43.03-.02.02h0Z"/>
+  <path class="st22" d="M103.85,244.54l-.09,12.09-.03,12.15c0,8.1.05,16.2.15,24.31.2,16.2.6,32.41,1.33,48.62.74,16.21,1.76,32.42,3.51,48.63.89,8.1,1.96,16.2,3.47,24.29.76,4.04,1.64,8.09,2.75,12.13,1.12,4.04,2.44,8.08,4.51,12.1l.85,1.51c.31.5.66,1,.98,1.5.34.5.77.99,1.16,1.48.21.27.38.43.56.63l.55.59c1.44,1.57,2.97,3.03,4.5,4.47,3.11,2.85,6.41,5.48,9.86,7.88,1.73,1.2,3.48,2.35,5.35,3.44l.74.42.7.37c.47.25.94.51,1.41.74.95.47,1.9.95,2.87,1.38,3.86,1.78,7.9,3.19,11.99,4.29,4.09,1.09,8.23,1.86,12.31,2.44l6.12.81,6.11.64c8.14.77,16.28,1.26,24.41,1.62,8.13.33,16.25.5,24.38.58,4.06.04,8.12.04,12.18.03l6.09-.05,6-.08,2.19-.04.11,5.67c3.1-3.18,6.17-6.38,9.2-9.61-3.22-3.03-6.4-6.08-9.55-9.16l.11,5.67-2.17.04-5.96.08-6.04.05c-4.03.02-8.05,0-12.08-.03-8.05-.08-16.1-.25-24.13-.57-8.03-.34-16.04-.84-24-1.58l-5.96-.62-5.91-.79c-3.93-.56-7.75-1.27-11.47-2.26-3.72-1.01-7.34-2.27-10.83-3.88-.87-.39-1.73-.82-2.59-1.25l-1.27-.67-.63-.34-.58-.33c-1.62-.95-3.25-2.01-4.84-3.12-3.18-2.22-6.22-4.65-9.08-7.26-1.4-1.32-2.8-2.65-4.1-4.07l-.49-.52c-.16-.17-.35-.36-.44-.5-.23-.31-.48-.56-.71-.91-.23-.35-.46-.68-.68-1.04l-.64-1.14c-1.64-3.18-2.89-6.85-3.91-10.6-1.03-3.76-1.87-7.63-2.61-11.53-1.47-7.81-2.51-15.75-3.4-23.73-1.72-15.96-2.75-32.05-3.47-48.15-.72-16.11-1.12-32.24-1.32-48.38-.09-8.07-.15-16.14-.15-24.21l.03-12.11.09-12.17-7.43.03h-.02,0Z"/>
+  <polygon class="st22" points="480.69 197.54 521 197.54 521 203.2 530.38 193.83 521 184.45 521 190.11 480.69 190.11 480.69 197.54"/>
+  <polygon class="st22" points="761.3 200.01 801 200.01 801 205.68 810.37 196.3 801 186.92 801 192.59 761.3 192.59 761.3 200.01"/>
+  <polygon class="st22" points="1035.93 199.25 1074.52 199.25 1074.52 204.91 1083.9 195.53 1074.52 186.15 1074.52 191.81 1035.93 191.81 1035.93 199.25"/>
+  <polygon class="st22" points="689.8 337.77 733.5 337.77 733.5 343.44 742.87 334.06 733.5 324.67 733.5 330.34 689.8 330.34 689.8 337.77"/>
+  <polygon class="st22" points="386.98 477.26 430.67 477.26 430.67 482.92 440.06 473.54 430.67 464.16 430.67 469.83 386.98 469.83 386.98 477.26"/>
+  <polygon class="st22" points="669.96 477.26 713.65 477.26 713.65 482.92 723.03 473.54 713.65 464.16 713.65 469.83 669.96 469.83 669.96 477.26"/>
+  <polygon class="st22" points="832.84 416.15 832.84 401.63 832.84 399.45 838.51 399.45 829.13 390.07 819.75 399.45 825.41 399.45 825.41 401.63 825.41 416.15 832.84 416.15"/>
+  <polygon class="st22" points="1125.16 524.55 1125.16 543.1 1125.16 545.28 1119.5 545.28 1128.88 554.66 1138.26 545.28 1132.59 545.28 1132.59 543.1 1132.59 524.55 1125.16 524.55"/>
+  <polygon class="st22" points="917.05 605.88 869.18 605.88 869.18 600.21 859.8 609.6 869.18 618.97 869.18 613.31 917.05 613.31 917.05 605.88"/>
+  <polygon class="st22" points="652.08 605.11 604.22 605.11 604.22 599.44 594.84 608.81 604.22 618.2 604.22 612.53 652.08 612.53 652.08 605.11"/>
+  <path class="st20" d="M268.78,594.91"/>
+  <rect class="st8" x="252.35" y="562" width="135.23" height="96.54"/>
+  <g class="st7">
+    <g class="st7">
+      <text class="st3" transform="translate(262.71 595.35) scale(.96 1)"><tspan x="0" y="0">plot()</tspan></text>
+    </g>
+  </g>
+  <g class="st7">
+    <g class="st7">
+      <text class="st5" transform="translate(264.77 626.72) scale(.96 1)"><tspan x="0" y="0">visualize</tspan></text>
+    </g>
+    <g class="st7">
+      <text class="st5" transform="translate(264.77 645.68) scale(.96 1)"><tspan x="0" y="0">current graph</tspan></text>
+    </g>
+  </g>
+  <polygon class="st22" points="449.88 605.11 402.02 605.11 402.02 599.44 392.64 608.81 402.02 618.2 402.02 612.53 449.88 612.53 449.88 605.11"/>
+  <path class="st22" d="M909.08,337.71c27.14.16,54.45.1,81.69-1.02,13.63-.56,27.25-1.37,40.87-2.5,13.61-1.21,27.22-2.76,40.76-5.05l5.07-.9,2.54-.44,2.52-.51c3.36-.67,6.72-1.41,10.07-2.19,6.7-1.55,13.35-3.31,19.94-5.34,3.32-1.02,6.55-2.08,9.9-3.35,3.28-1.29,6.5-2.7,9.69-4.38,3.16-1.7,6.3-3.64,9.16-6.14,1.43-1.25,2.78-2.65,3.98-4.14.59-.75,1.17-1.51,1.67-2.29l1.46-2.34.73-1.17c.23-.39.42-.81.63-1.21l1.23-2.44c.44-.8.73-1.65,1.08-2.49l1.01-2.51c.55-1.7,1.16-3.4,1.64-5.11l.68-2.58c.11-.43.23-.86.33-1.3l.27-1.3.54-2.6c.17-.87.29-1.74.44-2.61.3-1.74.5-3.49.71-5.23.21-1.75.32-3.5.46-5.25l.13-2.62c.02-.44.05-.87.05-1.31l.02-1.24c0-.75.05-1.49.03-2.24l5.67.02c-.79-.85-1.57-1.68-2.36-2.5-.8-.82-1.62-1.62-2.42-2.4-1.64-1.57-3.28-3.11-5.03-4.49-1.36,1.72-2.86,3.32-4.34,4.87-.76.78-1.52,1.54-2.28,2.28-.78.75-1.55,1.48-2.33,2.19l5.67.02c.02.7-.02,1.4-.03,2.11l-.02,1.16c0,.41-.02.82-.05,1.23l-.12,2.47c-.13,1.64-.23,3.28-.43,4.91-.19,1.63-.37,3.26-.66,4.87-.13.8-.24,1.62-.41,2.42l-.5,2.39-.25,1.19c-.09.4-.2.78-.3,1.18l-.62,2.35c-.43,1.55-.98,3.06-1.47,4.6l-.9,2.22c-.31.73-.56,1.5-.94,2.19l-1.06,2.12c-.18.35-.34.72-.54,1.05l-.62.99-1.23,1.99c-.41.66-.87,1.25-1.33,1.83-.93,1.16-1.94,2.21-3.08,3.19-2.26,1.97-4.93,3.65-7.75,5.17-2.83,1.49-5.85,2.82-8.89,4.01-3,1.13-6.23,2.19-9.41,3.17-6.39,1.96-12.89,3.68-19.44,5.2-3.28.76-6.56,1.48-9.86,2.14l-2.47.5-2.48.44-4.96.87c-13.26,2.23-26.69,3.78-40.15,4.97-13.48,1.12-26.99,1.92-40.53,2.48-13.53.57-27.09.84-40.65.99-13.57.15-27.11.08-40.74.03v7.43l.02-.03h0Z"/>
+  <path class="st22" d="M900.73,337.83c25.05-.14,49.95-.09,74.86.93,12.45.52,24.88,1.23,37.27,2.26,12.38,1.09,24.73,2.49,36.92,4.51,3.04.55,6.09,1.04,9.12,1.65s6.06,1.25,9.06,1.94c6.02,1.38,12,2.94,17.88,4.72,2.93.89,5.87,1.84,8.7,2.87,2.74,1.04,5.57,2.24,8.19,3.57,2.63,1.33,5.12,2.83,7.27,4.57,1.07.87,2.05,1.8,2.93,2.79.88,1.01,1.69,2.08,2.44,3.34,3.1,4.82,5.28,10.37,6.81,16.12.34,1.46.72,2.9,1.01,4.37.27,1.48.59,2.94.79,4.43.11.74.23,1.48.33,2.23l.26,2.25c.09.75.16,1.5.22,2.26l.09,1.12.05.56.03.5.12,2.1-5.66.25c1.62,1.35,3.22,2.77,4.78,4.25,1.55,1.49,3.1,3.01,4.48,4.71,1.73-1.4,3.33-3.03,4.9-4.66,1.58-1.65,3.09-3.35,4.59-5.13l-5.66.25-.12-2.25-.03-.54-.05-.6-.1-1.21c-.07-.8-.13-1.61-.23-2.41l-.28-2.41c-.1-.8-.23-1.6-.35-2.4-.22-1.61-.55-3.2-.85-4.79-.31-1.59-.73-3.18-1.1-4.77-1.69-6.31-4.1-12.56-7.76-18.26-.84-1.43-1.91-2.87-3.1-4.21s-2.49-2.56-3.84-3.66c-2.72-2.19-5.63-3.91-8.57-5.41-2.97-1.5-5.89-2.75-8.99-3.93-3.04-1.11-6.06-2.08-9.1-3.01-6.08-1.84-12.21-3.44-18.37-4.85-3.08-.72-6.17-1.37-9.27-1.99-3.1-.62-6.23-1.12-9.34-1.69-12.47-2.07-24.99-3.48-37.52-4.59-12.53-1.05-25.06-1.76-37.61-2.29-25.05-1.03-50.19-1.08-75.15-.94v7.43h-.03Z"/>
+  <rect class="st9" x="1283.42" y="135.65" width="292.72" height="59.37" rx="18" ry="18"/>
+  <circle class="st16" cx="1305.07" cy="167.41" r="8.12"/>
+  <text class="st4" transform="translate(1322.27 173.53)"><tspan x="0" y="0">Input alignment</tspan></text>
+  <rect class="st13" x="1283.42" y="213.2" width="292.72" height="59.31" rx="18" ry="18"/>
+  <circle class="st17" cx="1305.07" cy="244.96" r="8.12"/>
+  <text class="st4" transform="translate(1322.27 251.08)"><tspan x="0" y="0">Graph construction</tspan></text>
+  <rect class="st12" x="1283.42" y="290.76" width="292.72" height="61.19" rx="18" ry="18"/>
+  <circle class="st18" cx="1305.07" cy="322.51" r="8.12"/>
+  <text class="st4" transform="translate(1322.27 328.63)"><tspan x="0" y="0">Graph inspection</tspan></text>
+  <rect class="st8" x="1283.42" y="368.31" width="292.72" height="55.31" rx="18" ry="18"/>
+  <circle class="st19" cx="1305.07" cy="400.07" r="8.12"/>
+  <text class="st4" transform="translate(1323.29 406.18)"><tspan x="0" y="0">Visualization</tspan></text>
+  <rect class="st10" x="1283.42" y="445.86" width="292.72" height="57.52" rx="18" ry="18"/>
+  <circle class="st19" cx="1305.07" cy="477.62" r="8.12"/>
+  <text class="st4" transform="translate(1322.27 483.73)"><tspan x="0" y="0">Candidate tuning</tspan></text>
+  <rect class="st11" x="1283.42" y="523.41" width="292.72" height="60.9" rx="18" ry="18"/>
+  <circle class="st15" cx="1305.07" cy="555.17" r="8.12"/>
+  <text class="st4" transform="translate(1322.27 561.29)"><tspan x="0" y="0">Label-guided ranking</tspan></text>
+  <rect class="st14" x="1283.42" y="600.96" width="292.72" height="59.52" rx="18" ry="18"/>
+  <circle class="st21" cx="1305.07" cy="632.72" r="8.12"/>
+  <text class="st4" transform="translate(1321.51 638.84)"><tspan x="0" y="0">Shortlisting and rebuild</tspan></text>
+</svg>
