@@ -1797,11 +1797,16 @@ class Netan:
         *,
         layers: Optional[Union[str, Sequence[str]]] = None,
         per_layer: bool = False,
+        n_stability: Optional[int] = None,
         p_adj_max: Optional[float] = None,
         p_max: Optional[float] = None,
         score_min: Optional[float] = None,
         rank_max: Optional[float] = None,
         selected_freq_min: Optional[float] = None,
+        stability_rank_max: Optional[float] = None,
+        mean_rank_max: Optional[float] = None,
+        median_rank_max: Optional[float] = None,
+        stability_score_min: Optional[float] = None,
         verbose: bool = True,
     ) -> "Netan":
         """
@@ -1817,18 +1822,30 @@ class Netan:
             in the cached ranking result are eligible.
         per_layer : bool, default=False
             If ``True``, apply ``n`` separately within each layer.
+        n_stability : int, default=None
+            Number of top stability rows to keep before the final ``n`` cut.
+            Uses ``stability_rank``, ``selected_freq``, ``mean_rank``, and
+            ``stability_score`` ordering.
         p_adj_max : float, default=None
-            Keep only rows with ``p_adj <= p_adj_max`` when available.
+            Keep only rows with ``p_adj <= p_adj_max`` from ``rank()``.
         p_max : float, default=None
-            Keep only rows with ``p_perm <= p_max`` when available.
+            Keep only rows with ``p_perm <= p_max`` from ``rank()``.
         score_min : float, default=None
-            Keep only rows with score at or above this value.
+            Keep only rows with ``score >= score_min``. This is the
+            significance/effect score from ``rank()``.
         rank_max : float, default=None
-            Keep only rows with ``rank <= rank_max`` for ``rank`` results,
-            and-or ``mean_rank <= rank_max`` for stability-based results.
+            Keep only rows with ``rank <= rank_max`` from ``rank()``.
         selected_freq_min : float, default=None
             Keep only rows with ``selected_freq >= selected_freq_min`` when
-            available.
+            ``stability_rank()`` is available.
+        stability_rank_max : float, default=None
+            Keep only rows with ``stability_rank <= stability_rank_max``.
+        mean_rank_max : float, default=None
+            Keep only rows with ``mean_rank <= mean_rank_max``.
+        median_rank_max : float, default=None
+            Keep only rows with ``median_rank <= median_rank_max``.
+        stability_score_min : float, default=None
+            Keep only rows with ``stability_score >= stability_score_min``.
         verbose : bool, default=True
             If ``True``, also print a compact selection summary.
 
@@ -1851,36 +1868,76 @@ class Netan:
         """
         if n is not None and (not isinstance(n, Integral) or int(n) <= 0):
             raise ValueError("n must be an integer >= 1 when provided.")
+        if n_stability is not None and (not isinstance(n_stability, Integral) or int(n_stability) <= 0):
+            raise ValueError("n_stability must be an integer >= 1 when provided.")
 
         bundle = _feature_results_bundle(self, require=True)
         rank_table = bundle["table"].copy()
         source_graph = str(bundle.get("graph") or self._active_graph_name())
         source_label = str(bundle.get("label") or "")
 
+        def require_col(col: str, param: str) -> None:
+            if col not in rank_table.columns:
+                raise ValueError(f"{param} requires a ranking table with column '{col}'.")
+
+        def head_by(df: pd.DataFrame, limit: int, cols: List[str], asc: List[bool]) -> pd.DataFrame:
+            pairs = [(col, flag) for col, flag in zip(cols, asc) if col in df.columns]
+            ordered = df.sort_values(
+                [col for col, _ in pairs],
+                ascending=[flag for _, flag in pairs],
+                na_position="last",
+            ) if pairs else df
+            return (
+                ordered.groupby("layer", group_keys=False, sort=False).head(limit).copy()
+                if per_layer
+                else ordered.head(limit).copy()
+            )
+
         if layers is not None:
             wanted = set(map(str, _grid_list(layers)))
             rank_table = rank_table[rank_table["layer"].astype(str).isin(wanted)].copy()
         if score_min is not None:
-            score_col = "score" if "score" in rank_table.columns else ("stability_score" if "stability_score" in rank_table.columns else None)
-            if score_col is not None:
-                rank_table = rank_table[rank_table[score_col].astype(float) >= float(score_min)].copy()
-        if p_adj_max is not None and "p_adj" in rank_table.columns:
+            require_col("score", "score_min")
+            rank_table = rank_table[rank_table["score"].astype(float) >= float(score_min)].copy()
+        if p_adj_max is not None:
+            require_col("p_adj", "p_adj_max")
             rank_table = rank_table[rank_table["p_adj"].fillna(np.inf).astype(float) <= float(p_adj_max)].copy()
-        if p_max is not None and "p_perm" in rank_table.columns:
+        if p_max is not None:
+            require_col("p_perm", "p_max")
             rank_table = rank_table[rank_table["p_perm"].fillna(np.inf).astype(float) <= float(p_max)].copy()
-        if rank_max is not None and "rank" in rank_table.columns:
+        if rank_max is not None:
+            require_col("rank", "rank_max")
             rank_table = rank_table[rank_table["rank"].astype(float) <= float(rank_max)].copy()
-        if selected_freq_min is not None and "selected_freq" in rank_table.columns:
+        if selected_freq_min is not None:
+            require_col("selected_freq", "selected_freq_min")
             rank_table = rank_table[rank_table["selected_freq"].astype(float) >= float(selected_freq_min)].copy()
-        if rank_max is not None and "mean_rank" in rank_table.columns:
-            rank_table = rank_table[rank_table["mean_rank"].astype(float) <= float(rank_max)].copy()
+        if stability_rank_max is not None:
+            require_col("stability_rank", "stability_rank_max")
+            rank_table = rank_table[rank_table["stability_rank"].astype(float) <= float(stability_rank_max)].copy()
+        if mean_rank_max is not None:
+            require_col("mean_rank", "mean_rank_max")
+            rank_table = rank_table[rank_table["mean_rank"].astype(float) <= float(mean_rank_max)].copy()
+        if median_rank_max is not None:
+            require_col("median_rank", "median_rank_max")
+            rank_table = rank_table[rank_table["median_rank"].astype(float) <= float(median_rank_max)].copy()
+        if stability_score_min is not None:
+            require_col("stability_score", "stability_score_min")
+            rank_table = rank_table[rank_table["stability_score"].astype(float) >= float(stability_score_min)].copy()
+        if n_stability is not None:
+            require_col("stability_rank", "n_stability")
+            rank_table = head_by(
+                rank_table,
+                int(n_stability),
+                ["stability_rank", "selected_freq", "mean_rank", "stability_score"],
+                [True, False, True, False],
+            )
         if rank_table.empty:
             raise ValueError("No ranked features matched the requested layers.")
 
         picked = (
-            rank_table.groupby("layer", group_keys=False, sort=False).head(int(n)).copy()
-            if per_layer and n is not None
-            else (rank_table.head(int(n)).copy() if n is not None else rank_table.copy())
+            head_by(rank_table, int(n), ["rank", "score", "p_adj"], [True, False, True])
+            if n is not None
+            else rank_table.copy()
         )
         if picked.empty:
             raise ValueError("No ranked features were selected.")
@@ -1922,8 +1979,11 @@ class Netan:
                 **{k: stab_cached.get(k) for k in ("graph", "label", "layers", "sample_frac", "n_iter", "valid_iter", "top", "stratify")},
                 "table": _feature_identity_index(stab_base.merge(selected_keys, on=["layer", "feature_id"], how="inner")),
             }
+        _sync_features_back_to_rodins(out, prefix="netan", overwrite=True)
+        _clear_feature_views(out)
         out._results()["shortlist"] = {
             "n": None if n is None else int(n),
+            "n_stability": None if n_stability is None else int(n_stability),
             "per_layer": bool(per_layer),
             "graph": source_graph,
             "label": source_label,

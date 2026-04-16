@@ -247,7 +247,7 @@ def _glasso_matrix(
             "Try increasing alpha or preprocessing data."
         )
 
-    model: GraphicalLasso = result["model"]  # type: ignore[assignment]
+    model = result["model"]
     if model.precision_ is None:
         raise RuntimeError("glasso failed to converge")
 
@@ -1327,29 +1327,59 @@ def _subset_rodin(r, *, features: Optional[Sequence[str]] = None, samples: Optio
 
     X_sub = X.loc[feat_ids, sample_ids]
 
-    try:
-        out = r[X_sub]
-    except Exception:
-        out = copy.deepcopy(r)
+    def subset_features(F):
+        if not isinstance(F, pd.DataFrame):
+            return None
+        F = F.copy()
+        targets = list(map(str, feat_ids))
+        idx_map = {str(k): k for k in F.index}
+        if all(fid in idx_map for fid in targets):
+            out = F.loc[[idx_map[fid] for fid in targets]].copy()
+        elif F.shape[1]:
+            first = F.iloc[:, 0].astype(str)
+            first_set = set(first)
+            if first.is_unique and all(fid in first_set for fid in targets):
+                out = F.assign(_feature_id_=first).set_index("_feature_id_").loc[targets].copy()
+            elif len(F) == len(feat_native):
+                out = F.copy()
+                out.index = list(map(str, feat_native))
+                out = out.loc[targets].copy()
+            else:
+                out = pd.DataFrame(index=targets)
+        elif len(F) == len(feat_native):
+            out = F.copy()
+            out.index = list(map(str, feat_native))
+            out = out.loc[targets].copy()
+        else:
+            out = pd.DataFrame(index=targets)
+        out.index = targets
+        return out
 
-        F = getattr(out, "features", None)
-        F_sub = None
-        if isinstance(F, pd.DataFrame):
-            F_sub = F.copy().loc[[f for f in feat_ids if f in F.index]]
+    def subset_samples(S):
+        if not isinstance(S, pd.DataFrame) or S.empty:
+            return None
+        S = S.copy()
+        sid_col = S.columns[0]
+        detected_ids = list(S.iloc[:, 0])
+        detected_map = {str(k): k for k in detected_ids}
+        keep_native = [detected_map[str(s)] for s in sample_ids if str(s) in detected_map]
+        return S.set_index(sid_col).loc[keep_native].reset_index()
 
-        S = getattr(out, "samples", None)
-        S_sub = None
-        if isinstance(S, pd.DataFrame) and not S.empty:
-            S = S.copy()
-            sid_col = S.columns[0]
-            detected_ids = list(S.iloc[:, 0])
-            detected_map = {str(k): k for k in detected_ids}
-            keep_native = [detected_map[str(s)] for s in sample_ids if str(s) in detected_map]
-            S_sub = S.set_index(sid_col).loc[keep_native].reset_index()
-
+    out = copy.deepcopy(r)
+    F_sub = subset_features(getattr(r, "features", None))
+    S_sub = subset_samples(getattr(r, "samples", None))
+    if hasattr(out, "_X"):
         out._X = X_sub
+    else:
+        setattr(out, "X", X_sub)
+    if hasattr(out, "_features"):
         out._features = F_sub
+    else:
+        setattr(out, "features", F_sub)
+    if hasattr(out, "_samples"):
         out._samples = S_sub
+    else:
+        setattr(out, "samples", S_sub)
 
     S = getattr(out, "samples", None)
     if isinstance(S, pd.DataFrame):

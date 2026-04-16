@@ -102,7 +102,7 @@ nt.materialize()
 ```python
 nt.rank("Group")
 nt.stability_rank("Group")
-nt_small = nt.shortlist(p_adj_max=0.01)
+nt_small = nt.shortlist(p_adj_max=0.01, selected_freq_min=0.5)
 ```
 
 This workflow is available in `samples` mode and is useful when you want graph-aware feature selection before rebuilding a smaller network.
