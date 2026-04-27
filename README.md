@@ -1,7 +1,6 @@
 # netan
 
 [![PyPI version](https://img.shields.io/pypi/v/netan.svg)](https://pypi.org/project/netan/)
-[![Python](https://img.shields.io/pypi/pyversions/netan.svg)](https://pypi.org/project/netan/)
 [![License](https://img.shields.io/pypi/l/netan.svg)](LICENSE)
 
 `netan` is a network analysis library for omics data. It builds sample or feature graphs from one or more matrices, tunes graph construction, ranks features against sample labels, and exports publication-ready or Cytoscape-ready outputs.

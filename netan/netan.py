@@ -1525,18 +1525,19 @@ class Netan:
         -----------
         The graph itself is kept fixed. Each iteration samples a subset of
         labeled nodes, builds the induced subgraph, and reruns the same
-        edge-based ranking used by ``rank()``. The final table summarizes how
-        often each feature is selected and how stable its score and rank are
-        across iterations. The latest stability result is also synced
-        automatically back into each ``rodin.features`` table under
-        ``netan_*`` analytical columns such as ``netan_stability_rank`` and
-        ``netan_selected_freq``.
+        edge-based ranking used by ``rank()``. ``stability_rank`` is defined
+        by ascending mean rank across valid subsampling iterations, with mean
+        score used only to break ties. Selection frequency, median rank, and
+        score spread are reported as diagnostics. The latest stability result
+        is also synced automatically back into each ``rodin.features`` table
+        under ``netan_*`` analytical columns such as
+        ``netan_stability_rank`` and ``netan_mean_rank``.
 
         Returns
         -------
         pandas.DataFrame
-            Stability table with selection frequency, mean rank, and mean
-            score.
+            Stability table ranked by mean rank, with selection frequency,
+            median rank, mean score, and score spread.
         """
         if str((self._meta or {}).get("nodeMode", "samples")) != "samples":
             raise ValueError("stability_rank() requires a sample graph built with node_mode='samples'.")
@@ -1610,7 +1611,7 @@ class Netan:
             )
         )
         agg["score_sd"] = agg["score_sd"].fillna(0.0)
-        agg = agg.sort_values(["selected_freq", "mean_rank", "score"], ascending=[False, True, False]).reset_index(drop=True)
+        agg = agg.sort_values(["mean_rank", "score"], ascending=[True, False]).reset_index(drop=True)
         agg.insert(0, "rank", np.arange(1, len(agg) + 1, dtype=int))
         agg = _feature_identity_index(agg)
         _cohere_feature_ranking_results(self, keep="rank_stability", graph_name=graph_name, label=str(label))
@@ -1797,7 +1798,9 @@ class Netan:
         *,
         layers: Optional[Union[str, Sequence[str]]] = None,
         per_layer: bool = False,
+        frac: Optional[float] = None,
         n_stability: Optional[int] = None,
+        stability_frac: Optional[float] = None,
         p_adj_max: Optional[float] = None,
         p_max: Optional[float] = None,
         score_min: Optional[float] = None,
@@ -1821,11 +1824,19 @@ class Netan:
             Optional subset of layers to keep. If omitted, all layers present
             in the cached ranking result are eligible.
         per_layer : bool, default=False
-            If ``True``, apply ``n`` separately within each layer.
+            If ``True``, apply ``n``, ``frac``, ``n_stability``, and
+            ``stability_frac`` separately within each layer.
+        frac : float, default=None
+            Fraction of top ``rank()`` rows to keep after filtering. Must be
+            in ``(0, 1]``. Mutually exclusive with ``n``.
         n_stability : int, default=None
             Number of top stability rows to keep before the final ``n`` cut.
-            Uses ``stability_rank``, ``selected_freq``, ``mean_rank``, and
-            ``stability_score`` ordering.
+            Uses ``stability_rank`` ordering, which is based on ascending
+            mean rank across valid subsampling iterations.
+        stability_frac : float, default=None
+            Fraction of top ``stability_rank()`` rows to keep before the final
+            ``n`` or ``frac`` cut. Must be in ``(0, 1]``. Mutually exclusive
+            with ``n_stability``.
         p_adj_max : float, default=None
             Keep only rows with ``p_adj <= p_adj_max`` from ``rank()``.
         p_max : float, default=None
@@ -1855,6 +1866,9 @@ class Netan:
         column. If both ``rank()`` and ``stability_rank()`` exist for the same
         graph and ``label``, significance and stability columns are available
         together in one combined selection table.
+        Threshold filters are applied first, ``n_stability`` /
+        ``stability_frac`` are stability pre-cuts, and ``n`` / ``frac`` are
+        final top cuts.
 
         With defaults (``n=None``, ``layers=None``, and no threshold filters),
         the new object keeps every ranked feature currently present in the
@@ -1870,6 +1884,18 @@ class Netan:
             raise ValueError("n must be an integer >= 1 when provided.")
         if n_stability is not None and (not isinstance(n_stability, Integral) or int(n_stability) <= 0):
             raise ValueError("n_stability must be an integer >= 1 when provided.")
+        if n is not None and frac is not None:
+            raise ValueError("Use either n or frac, not both.")
+        if n_stability is not None and stability_frac is not None:
+            raise ValueError("Use either n_stability or stability_frac, not both.")
+        if frac is not None and (not isinstance(frac, Real) or isinstance(frac, bool) or not (0 < float(frac) <= 1)):
+            raise ValueError("frac must be a float in (0, 1] when provided.")
+        if stability_frac is not None and (
+            not isinstance(stability_frac, Real)
+            or isinstance(stability_frac, bool)
+            or not (0 < float(stability_frac) <= 1)
+        ):
+            raise ValueError("stability_frac must be a float in (0, 1] when provided.")
 
         bundle = _feature_results_bundle(self, require=True)
         rank_table = bundle["table"].copy()
@@ -1880,18 +1906,31 @@ class Netan:
             if col not in rank_table.columns:
                 raise ValueError(f"{param} requires a ranking table with column '{col}'.")
 
-        def head_by(df: pd.DataFrame, limit: int, cols: List[str], asc: List[bool]) -> pd.DataFrame:
+        def order_by(df: pd.DataFrame, cols: List[str], asc: List[bool]) -> pd.DataFrame:
             pairs = [(col, flag) for col, flag in zip(cols, asc) if col in df.columns]
-            ordered = df.sort_values(
+            return df.sort_values(
                 [col for col, _ in pairs],
                 ascending=[flag for _, flag in pairs],
                 na_position="last",
             ) if pairs else df
+
+        def head_by(df: pd.DataFrame, limit: int, cols: List[str], asc: List[bool]) -> pd.DataFrame:
+            ordered = order_by(df, cols, asc)
             return (
                 ordered.groupby("layer", group_keys=False, sort=False).head(limit).copy()
                 if per_layer
                 else ordered.head(limit).copy()
             )
+
+        def head_frac_by(df: pd.DataFrame, fraction: float, cols: List[str], asc: List[bool]) -> pd.DataFrame:
+            ordered = order_by(df, cols, asc)
+            if per_layer:
+                pieces = [
+                    grp.head(max(1, int(np.ceil(len(grp) * float(fraction)))))
+                    for _, grp in ordered.groupby("layer", sort=False)
+                ]
+                return pd.concat(pieces, axis=0).copy() if pieces else ordered.head(0).copy()
+            return ordered.head(max(1, int(np.ceil(len(ordered) * float(fraction))))).copy()
 
         if layers is not None:
             wanted = set(map(str, _grid_list(layers)))
@@ -1928,17 +1967,26 @@ class Netan:
             rank_table = head_by(
                 rank_table,
                 int(n_stability),
-                ["stability_rank", "selected_freq", "mean_rank", "stability_score"],
-                [True, False, True, False],
+                ["stability_rank", "stability_score"],
+                [True, False],
+            )
+        if stability_frac is not None:
+            require_col("stability_rank", "stability_frac")
+            rank_table = head_frac_by(
+                rank_table,
+                float(stability_frac),
+                ["stability_rank", "stability_score"],
+                [True, False],
             )
         if rank_table.empty:
             raise ValueError("No ranked features matched the requested layers.")
 
-        picked = (
-            head_by(rank_table, int(n), ["rank", "score", "p_adj"], [True, False, True])
-            if n is not None
-            else rank_table.copy()
-        )
+        if n is not None:
+            picked = head_by(rank_table, int(n), ["rank", "score", "p_adj"], [True, False, True])
+        elif frac is not None:
+            picked = head_frac_by(rank_table, float(frac), ["rank", "score", "p_adj"], [True, False, True])
+        else:
+            picked = rank_table.copy()
         if picked.empty:
             raise ValueError("No ranked features were selected.")
 
@@ -1983,7 +2031,9 @@ class Netan:
         _clear_feature_views(out)
         out._results()["shortlist"] = {
             "n": None if n is None else int(n),
+            "frac": None if frac is None else float(frac),
             "n_stability": None if n_stability is None else int(n_stability),
+            "stability_frac": None if stability_frac is None else float(stability_frac),
             "per_layer": bool(per_layer),
             "graph": source_graph,
             "label": source_label,
